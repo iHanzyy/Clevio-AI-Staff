@@ -110,6 +110,7 @@ export default function ClevioLandingPage() {
            </section>
 
            <UseCasesSection />
+           <HowItWorksSection />
         </main>
       </div>
     </>
@@ -215,6 +216,90 @@ function UseCasesSection() {
                          <div className="absolute bottom-0 right-0 w-[80px] h-[80px]">
                             <div className={`absolute bottom-0 right-0 w-[80px] h-[80px] ${card.foldColor} rounded-br-[2.5rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] z-20`}></div>
                             <div className="absolute bottom-0 right-0 w-[80px] h-[80px] bg-white rounded-br-[3rem] z-10"></div>
+                         </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+  );
+}
+
+function HowItWorksSection() {
+  const steps = [
+    {
+        title: "Daftar & Pilih Peran",
+        desc: "Buat akun dan pilih peran Staff AI yang sesuai dengan kebutuhan bisnis Anda",
+        color: "bg-[#FDF4C8]", // Cream
+        cornerColor: "bg-[#C0A865]", // Dark Gold
+        textColor: "text-[#5D4037]", // Dark Brown
+        image: "/carousel-works/daftarDanPilihPeran.png"
+    },
+    {
+        title: "Kustomisasi & Latih",
+        desc: "Sesuaikan personality dan latih Staff AI dengan data bisnis Anda",
+        color: "bg-[#7895A9]", // Slate Blue
+        cornerColor: "bg-[#455A64]", // Dark Slate
+        textColor: "text-[#263238]", // Dark Blue Gray
+        image: "/carousel-works/kostumisasiDanLatih.png"
+    },
+    {
+        title: "Aktifkan & Pantau",
+        desc: "Aktifkan Staff AI Anda dan pantau performa secara real-time",
+        color: "bg-[#FAD9D5]", // Pink
+        cornerColor: "bg-[#A67C7C]", // Dark Pink
+        textColor: "text-[#4E342E]", // Dark Red Brown
+        image: "/carousel-works/aktifkanDanPantau.png"
+    }
+  ];
+
+  return (
+    <section className="w-full bg-[#F7F7F4] py-24 px-8 flex justify-center z-20 relative">
+        <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-6 tracking-tight">
+                    Cara Kerja Clevio
+                </h2>
+                <p className="text-xl md:text-2xl text-black font-medium leading-normal">
+                    Mulai dengan Staf AI Anda <br className="hidden md:block"/> dalam 3 langkah mudah
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {steps.map((step, idx) => (
+                    <div 
+                        key={idx}
+                        className={`relative w-full aspect-[3/4] max-h-[500px] md:max-h-none ${step.color} rounded-[2.5rem] flex flex-col overflow-hidden shadow-lg transition-transform hover:-translate-y-2 duration-300 group mx-auto max-w-[360px] md:max-w-none`}
+                    >
+                         {/* Top Half: Illustration Area */}
+                         <div className="h-[55%] w-full relative flex items-center justify-center pt-8">
+                            <div className="relative w-[80%] h-[80%]">
+                                <Image 
+                                    src={step.image} 
+                                    alt={step.title}
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
+                         </div>
+
+                         {/* Bottom Half: Text Content */}
+                         <div className={`h-[45%] w-full px-8 pt-4 pb-8 flex flex-col ${step.textColor} relative z-10 text-center md:text-left`}>
+                            <h3 className="font-bold text-2xl md:text-[26px] leading-tight mb-4">
+                                {step.title}
+                            </h3>
+                            <p className="text-[15px] md:text-[16px] leading-relaxed opacity-90 font-medium">
+                                {step.desc}
+                            </p>
+                         </div>
+
+                         {/* Folded Corner Effect - 1:1 Match with Design */}
+                         <div className="absolute bottom-0 right-0 w-[100px] h-[100px]">
+                            {/* The Fold itself (Dark Shape) */}
+                            <div className={`absolute bottom-0 right-0 w-[100px] h-[100px] ${step.cornerColor} rounded-br-[2.4rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.15)] z-20`}></div>
+                            
+                            {/* Masking/Background match - Since section is #F7F7F4, we use that for the mask */}
+                            <div className="absolute bottom-0 right-0 w-[100px] h-[100px] bg-[#F7F7F4] rounded-br-[2.8rem] z-10 pl-2 pt-2"></div>
                          </div>
                     </div>
                 ))}
