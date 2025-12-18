@@ -162,7 +162,11 @@ export default function MobileLanding() {
         </header>
 
         {/* Hero Background */}
-        <div className="relative h-[100dvh] w-full shrink-0" onClick={handleBackgroundClick}>
+        <div 
+            className="relative h-[100dvh] w-full shrink-0" 
+            onClick={handleBackgroundClick}
+            suppressHydrationWarning
+        >
             <div className="absolute inset-0 z-0">
             <Image
                 src="/landing-page/top-image.png"
@@ -383,6 +387,8 @@ export default function MobileLanding() {
         {/* Carousel Section - Always Rendered Below */}
         <CarouselSection />
 
+
+
         {/* How It Works Section */}
         <HowItWorksSection />
 
@@ -395,6 +401,158 @@ export default function MobileLanding() {
       <FooterSection />
 
       </div>
+    </div>
+  );
+}
+
+
+function MobileUseCasesSection() {
+  // Unified text color: Dark Espresso Brown
+  const textColor = "text-[#2D2216]";
+  const descColor = "text-[#4A3C2F]";
+
+  const cards = [
+    {
+        icon: <MessageSquare className="w-6 h-6 text-[#5D4E37]" />,
+        title: "Customer Service",
+        desc: "Layani pelanggan 24/7 dengan respons cepat dan akurat",
+        bg: "#F2F2F2",
+        foldColor: "#B0B0B0", // Darker Grayscale
+        holeShadow: "rgba(0,0,0,0.15)",
+    },
+    {
+        icon: <ShoppingCart className="w-6 h-6 text-[#5D4E37]" />,
+        title: "Sales Asistant",
+        desc: "Tingkatkan penjualan dengan rekomendasi produk yang tepat",
+        bg: "#A8C5D4",
+        foldColor: "#7A98A8", // Darker Blue
+        holeShadow: "rgba(0,0,0,0.2)",
+    },
+    {
+        icon: <Headset className="w-6 h-6 text-[#5D4E37]" />,
+        title: "Support Agent",
+        desc: "Berikan dukungan teknis yang efisien dan profesional",
+        bg: "#FFF59D",
+        foldColor: "#D8C85A", // Darker Yellow
+        holeShadow: "rgba(0,0,0,0.12)",
+    },
+    {
+        icon: <TrendingUp className="w-6 h-6 text-[#5D4E37]" />,
+        title: "Marketing Assistant",
+        desc: "Otomatisasi kampanye marketing dan analisis data",
+        bg: "#9DC99D",
+        foldColor: "#6A9F6A", // Darker Green
+        holeShadow: "rgba(0,0,0,0.15)",
+    },
+    {
+        icon: <Users className="w-6 h-6 text-[#5D4E37]" />,
+        title: "HR Assistant",
+        desc: "Kelola rekrutmen dan onboarding karyawan dengan mudah",
+        bg: "#F5B8CF",
+        foldColor: "#C888A0", // Darker Pink
+        holeShadow: "rgba(0,0,0,0.12)",
+    },
+    {
+        icon: <FileText className="w-6 h-6 text-[#5D4E37]" />,
+        title: "Admin Assistant",
+        desc: "Atur jadwal, dokumen, dan tugas administratif lainnya",
+        bg: "#F5C896",
+        foldColor: "#C89860", // Darker Orange
+        holeShadow: "rgba(0,0,0,0.15)",
+    }
+  ];
+
+  return (
+    <div className="w-full bg-white pb-20 pt-10 px-0 flex flex-col items-center">
+        <div className="px-6 text-center mb-8">
+            <h2 className="text-3xl font-extrabold text-black mb-4 tracking-tight leading-tight">
+                Staf AI Apa Lagi Yang Bisa Anda Buat?
+            </h2>
+            <p className="text-lg text-gray-600 font-medium leading-normal">
+                Banyak tugas yang bisa dibantu para staf AI Anda :
+            </p>
+        </div>
+
+        {/* Horizontal Scroll Container */}
+        <div 
+            className="w-full flex overflow-x-auto gap-6 px-6 pb-8 snap-x snap-mandatory scrollbar-hide"
+            style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+        >
+            {cards.map((card, idx) => (
+                <div 
+                    key={idx}
+                    className="relative shrink-0 w-[280px] h-[320px] rounded-[2rem] p-8 flex flex-col snap-center overflow-hidden shadow-lg transition-transform active:scale-95 group"
+                    style={{ 
+                        backgroundColor: card.bg,
+                        boxShadow: `
+                            0 15px 35px rgba(0,0,0,0.12),
+                            0 5px 15px rgba(0,0,0,0.08)
+                        `,
+                    }}
+                >
+                     {/* Binder Holes - Intense Shadow */}
+                    <div className="absolute top-5 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                        {[0, 1, 2].map((i) => (
+                            <div 
+                                key={i} 
+                                className="w-4 h-4 rounded-full bg-white"
+                                style={{
+                                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(0,0,0,0.4)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+
+                    <div className="flex flex-col gap-5 mt-6 relative z-10 h-full">
+                        {/* Icon Box - EXACT Desktop Shadow Logic (Neumorphic) */}
+                        <div 
+                            className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                            style={{
+                                backgroundColor: card.bg,
+                                boxShadow: `
+                                    3px 3px 8px rgba(0,0,0,0.12),
+                                    -2px -2px 6px rgba(255,255,255,0.5),
+                                    inset 1px 1px 2px rgba(255,255,255,0.3)
+                                `
+                            }}
+                        >
+                            {card.icon}
+                        </div>
+                        
+                        <div className="flex flex-col flex-1">
+                            <h3 className={`font-black text-xl mb-2 ${textColor} leading-tight`}>{card.title}</h3>
+                            <p className={`text-[14px] font-semibold leading-relaxed w-[90%] ${descColor}`}>
+                                {card.desc}
+                            </p>
+                        </div>
+                    </div>
+
+                     {/* Folded Corner - EXACT Desktop CSS */}
+                     <div className="absolute bottom-0 right-0 w-[80px] h-[80px] drop-shadow-[-4px_-4px_6px_rgba(0,0,0,0.15)]">
+                        {/* Shadow Triangle (Back) */}
+                        <div 
+                            className="absolute bottom-0 right-0 w-0 h-0"
+                            style={{
+                                borderStyle: 'solid',
+                                borderWidth: '0 0 80px 80px',
+                                borderColor: 'transparent transparent rgba(0,0,0,0.25) transparent',
+                            }}
+                        ></div>
+                        
+                        {/* Fold Triangle (Flap) */}
+                        <div 
+                            className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                            style={{
+                                borderStyle: 'solid',
+                                borderWidth: '80px 80px 0 0',
+                                borderColor: `${card.foldColor} transparent transparent transparent`,
+                            }}
+                        ></div>
+                     </div>
+                </div>
+            ))}
+            <div className="w-2 shrink-0"></div>
+        </div>
     </div>
   );
 }
@@ -615,60 +773,58 @@ function CarouselSection() {
     }
   };
 
+  // Unified text color based on Desktop
+  const textColor = "text-[#2D2216]";
+  const descColor = "text-[#4A3C2F]";
+
   const cards = [
     {
-        icon: <MessageSquare className="w-6 h-6 text-black" />,
+        icon: <MessageSquare className="w-6 h-6 text-[#5D4E37]" />,
         title: "Customer Service",
         desc: "Layani pelanggan 24/7 dengan respons cepat dan akurat",
-        bg: "bg-[#F2F2F2]", 
-        foldColor: "bg-[#9E9E9E]",
-        iconBg: "bg-white",
-        text: "text-black"
+        bg: "#F2F2F2",
+        foldColor: "#B0B0B0", // Darker Grayscale
+        holeShadow: "rgba(0,0,0,0.15)",
     },
     {
-        icon: <ShoppingCart className="w-6 h-6 text-black" />,
+        icon: <ShoppingCart className="w-6 h-6 text-[#5D4E37]" />,
         title: "Sales Asistant",
         desc: "Tingkatkan penjualan dengan rekomendasi produk yang tepat",
-        bg: "bg-[#90A4AE]", 
-        foldColor: "bg-[#546E7A]",
-        iconBg: "bg-white/30",
-        text: "text-black"
+        bg: "#A8C5D4",
+        foldColor: "#7A98A8", // Darker Blue
+        holeShadow: "rgba(0,0,0,0.2)",
     },
     {
-        icon: <Headset className="w-6 h-6 text-black" />,
+        icon: <Headset className="w-6 h-6 text-[#5D4E37]" />,
         title: "Support Agent",
         desc: "Berikan dukungan teknis yang efisien dan profesional",
-        bg: "bg-[#FFF59D]", 
-        foldColor: "bg-[#AFB42B]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#FFF59D",
+        foldColor: "#D8C85A", // Darker Yellow
+        holeShadow: "rgba(0,0,0,0.12)",
     },
     {
-        icon: <TrendingUp className="w-6 h-6 text-black" />,
+        icon: <TrendingUp className="w-6 h-6 text-[#5D4E37]" />,
         title: "Marketing Assistant",
         desc: "Otomatisasi kampanye marketing dan analisis data",
-        bg: "bg-[#A5D6A7]", 
-        foldColor: "bg-[#558B2F]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#9DC99D",
+        foldColor: "#6A9F6A", // Darker Green
+        holeShadow: "rgba(0,0,0,0.15)",
     },
     {
-        icon: <Users className="w-6 h-6 text-black" />,
+        icon: <Users className="w-6 h-6 text-[#5D4E37]" />,
         title: "HR Assistant",
         desc: "Kelola rekrutmen dan onboarding karyawan dengan mudah",
-        bg: "bg-[#F48FB1]", 
-        foldColor: "bg-[#AD1457]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#F5B8CF",
+        foldColor: "#C888A0", // Darker Pink
+        holeShadow: "rgba(0,0,0,0.12)",
     },
     {
-        icon: <FileText className="w-6 h-6 text-black" />,
+        icon: <FileText className="w-6 h-6 text-[#5D4E37]" />,
         title: "Admin Assistant",
         desc: "Atur jadwal, dokumen, dan tugas administratif lainnya",
-        bg: "bg-[#FFCC80]", 
-        foldColor: "bg-[#EF6C00]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#F5C896",
+        foldColor: "#C89860", // Darker Orange
+        holeShadow: "rgba(0,0,0,0.15)",
     }
   ];
 
@@ -689,46 +845,79 @@ function CarouselSection() {
             {/* Carousel Container */}
             <div 
                 ref={scrollRef}
-                className="w-full flex overflow-x-auto gap-5 px-8 pb-12 snap-x snap-mandatory scrollbar-hide relative z-10 pl-8"
+                className="w-full flex overflow-x-auto gap-6 px-6 pb-8 snap-x snap-mandatory scrollbar-hide"
                 style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
             >
                 {cards.map((card, idx) => (
                     <div 
                         key={idx}
-                        className={`relative shrink-0 w-[280px] h-[190px] ${card.bg} rounded-[2rem] p-6 flex flex-col snap-center shadow-lg`}
+                        className="relative shrink-0 w-[280px] h-[320px] rounded-[2rem] p-8 flex flex-col snap-center overflow-hidden shadow-lg transition-transform active:scale-95 group"
+                        style={{ 
+                            backgroundColor: card.bg,
+                            boxShadow: `
+                                0 15px 35px rgba(0,0,0,0.12),
+                                0 5px 15px rgba(0,0,0,0.08)
+                            `,
+                        }}
                     >
-                        {/* Binder Holes */}
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                            <div className="w-3.5 h-3.5 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
-                            <div className="w-3.5 h-3.5 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
-                            <div className="w-3.5 h-3.5 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
+                        {/* Binder Holes - Intense Shadow */}
+                        <div className="absolute top-5 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                            {[0, 1, 2].map((i) => (
+                                <div 
+                                    key={i} 
+                                    className="w-4 h-4 rounded-full bg-white"
+                                    style={{
+                                        boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(0,0,0,0.4)'
+                                    }}
+                                ></div>
+                            ))}
                         </div>
 
-                        <div className="flex flex-col gap-3 mt-5 relative z-10">
-                            <div className={`w-12 h-12 ${card.iconBg} rounded-[1rem] flex items-center justify-center shadow-sm`}>
+                        <div className="flex flex-col gap-5 mt-6 relative z-10 h-full">
+                            {/* Icon Box - EXACT Desktop Shadow Logic (Neumorphic) */}
+                            <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                                style={{
+                                    backgroundColor: card.bg,
+                                    boxShadow: `
+                                        3px 3px 8px rgba(0,0,0,0.12),
+                                        -2px -2px 6px rgba(255,255,255,0.5),
+                                        inset 1px 1px 2px rgba(255,255,255,0.3)
+                                    `
+                                }}
+                            >
                                 {card.icon}
                             </div>
-                            <div>
-                                <h3 className={`font-black text-[17px] mb-1 ${card.text} leading-tight`}>{card.title}</h3>
-                                <p className={`text-[11px] font-semibold leading-snug w-[85%] ${card.text} opacity-70`}>
+                            
+                            <div className="flex flex-col flex-1">
+                                <h3 className={`font-black text-xl mb-2 ${textColor} leading-tight`}>{card.title}</h3>
+                                <p className={`text-[14px] font-semibold leading-relaxed w-[90%] ${descColor}`}>
                                     {card.desc}
                                 </p>
                             </div>
                         </div>
 
-                        {/* Folded Corner Effect - Fixed Geometry */}
-                         <div className="absolute bottom-0 right-0 w-[60px] h-[60px]">
-                            {/* The Fold itself (Dark Shape)
-                                - "Kiri atas lancip" -> Top-Left Sharp (rounded-tl-none)
-                                - "Kanan bawah rounded" -> Bottom-Right Rounded (rounded-br-[2rem])
-                                - Shape is a square patch that sits on the corner.
-                            */}
-                            <div className={`absolute bottom-0 right-0 w-[60px] h-[60px] ${card.foldColor} rounded-br-[2rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] z-20`}></div>
+                        {/* Folded Corner - EXACT Desktop CSS */}
+                         <div className="absolute bottom-0 right-0 w-[80px] h-[80px] drop-shadow-[-4px_-4px_6px_rgba(0,0,0,0.15)]">
+                            {/* Shadow Triangle (Back) */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '0 0 80px 80px',
+                                    borderColor: 'transparent transparent rgba(0,0,0,0.25) transparent',
+                                }}
+                            ></div>
                             
-                            {/* Masking the card corner behind isn't strictly necessary if the fold covers it,
-                                but putting a container-bg colored block behind helps if there are gaps or for alpha blending.
-                            */}
-                            <div className="absolute bottom-0 right-0 w-[60px] h-[60px] bg-[#E5E7EB] rounded-br-[3rem] z-10"></div>
+                            {/* Fold Triangle (Flap) */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '80px 80px 0 0',
+                                    borderColor: `${card.foldColor} transparent transparent transparent`,
+                                }}
+                            ></div>
                          </div>
                     </div>
                 ))}
