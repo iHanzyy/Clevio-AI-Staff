@@ -672,13 +672,27 @@ function PricingSection() {
     return (
         <section className="w-full bg-white py-16 px-4 md:px-8 flex justify-center z-20 relative">
             <div className="container mx-auto max-w-6xl">
-                 {/* Wooden Container */}
-                <div className="w-full bg-[#EBCFB2] rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl">
-                     <div className="text-center mb-10">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#4E342E] mb-3 tracking-tight">
+                 {/* Sticky Note Container */}
+                <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-8 md:p-12 pt-28 relative overflow-hidden shadow-[0_15px_35px_rgba(0,0,0,0.12),0_5px_15px_rgba(0,0,0,0.08)]">
+                     
+                     {/* Binder Holes - Top Left */}
+                     <div className="absolute top-8 left-8 md:left-12 flex gap-4 z-20">
+                        {[0, 1, 2, 3].map((i) => (
+                            <div 
+                                key={i} 
+                                className="w-6 h-6 rounded-full bg-white"
+                                style={{
+                                    boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+
+                    <div className="text-center mb-8 relative z-10">
+                        <h2 className="text-3xl md:text-5xl font-extrabold text-black mb-4Tracking-tight">
                             Pilih Paket Anda
                         </h2>
-                        <p className="text-lg text-[#795548] font-bold">
+                        <p className="text-xl text-[#5D4037] font-bold">
                             Lihat perbedaan signifikan antara<br/>
                             Staf Biasa dan Staf AI
                         </p>
