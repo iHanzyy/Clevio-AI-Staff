@@ -563,51 +563,56 @@ function HowItWorksSection() {
   const scroll = (direction) => {
     if (scrollRef.current) {
         const { current } = scrollRef;
-        const itemWidth = 270; // Card width + gap
+        const itemWidth = 300; 
         const currentScroll = current.scrollLeft;
         const index = Math.round(currentScroll / itemWidth);
-        const targetScroll = direction === 'left' 
-            ? Math.max(0, (index - 1) * itemWidth)
-            : (index + 1) * itemWidth;
         
+        let targetScroll;
+        if (direction === 'left') {
+            targetScroll = Math.max(0, (index - 1) * itemWidth);
+        } else {
+            targetScroll = (index + 1) * itemWidth;
+        }
+
         current.scrollTo({ left: targetScroll, behavior: 'smooth' });
     }
   };
+
+  // Unified text color for consistency
+  const textColor = "text-[#2D2216]";
+  const descColor = "text-[#4A3C2F]";
 
   const steps = [
     {
         title: "Daftar & Pilih Peran",
         desc: "Buat akun dan pilih peran Staff AI yang sesuai dengan kebutuhan bisnis Anda",
-        color: "bg-[#FDF4C8]", // Cream
-        cornerColor: "bg-[#C0A865]", // Dark Gold
-        textColor: "text-[#5D4037]", // Dark Brown
+        bg: "#FDF4C8", // Cream
+        foldColor: "#C0A865", // Dark Gold
         image: "/carousel-works/daftarDanPilihPeran.webp"
     },
     {
         title: "Kustomisasi & Latih",
         desc: "Sesuaikan personality dan latih Staff AI dengan data bisnis Anda",
-        color: "bg-[#7895A9]", // Slate Blue
-        cornerColor: "bg-[#455A64]", // Dark Slate
-        textColor: "text-[#263238]", // Dark Blue Gray
+        bg: "#A8C0D4", // Slate Blue-ish
+        foldColor: "#6C8796", // Darker Slate
         image: "/carousel-works/kostumisasiDanLatih.webp"
     },
     {
         title: "Aktifkan & Pantau",
         desc: "Aktifkan Staff AI Anda dan pantau performa secara real-time",
-        color: "bg-[#FAD9D5]", // Pink
-        cornerColor: "bg-[#A67C7C]", // Dark Pink
-        textColor: "text-[#4E342E]", // Dark Red Brown
+        bg: "#FAD9D5", // Pink
+        foldColor: "#C48E8E", // Darker Pink
         image: "/carousel-works/aktifkanDanPantau.webp"
     }
   ];
 
   return (
-    <div className="w-full bg-white pb-20 pt-4 px-0 flex flex-col items-center">
-        <div className="px-6 text-center mb-8">
-            <h2 className="text-2xl font-bold text-[#1E3A8A] leading-tight mb-2">
+    <div className="w-full bg-[#F7F7F4] pb-20 pt-10 px-0 flex flex-col items-center">
+        <div className="px-6 text-center mb-10">
+            <h2 className="text-3xl font-extrabold text-black mb-4 tracking-tight leading-tight">
                 Cara Kerja Clevio
             </h2>
-            <p className="text-black font-medium leading-snug">
+            <p className="text-lg text-black font-medium leading-normal">
                 Mulai dengan Staf AI Anda <br/> dalam 3 langkah mudah
             </p>
         </div>
@@ -615,17 +620,37 @@ function HowItWorksSection() {
         {/* Carousel Container */}
         <div 
             ref={scrollRef}
-            className="w-full flex overflow-x-auto gap-5 px-6 pb-6 snap-x snap-mandatory scrollbar-hide"
+            className="w-full flex overflow-x-auto gap-6 px-6 pb-8 snap-x snap-mandatory scrollbar-hide"
             style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
         >
             {steps.map((step, idx) => (
                 <div 
                     key={idx}
-                    className={`relative shrink-0 w-[280px] h-[380px] ${step.color} rounded-[2rem] flex flex-col snap-center overflow-hidden shadow-lg group`}
+                    className="relative shrink-0 w-[280px] h-[480px] rounded-[2.5rem] flex flex-col snap-center overflow-hidden shadow-lg group"
+                    style={{ 
+                        backgroundColor: step.bg,
+                        boxShadow: `
+                            0 15px 35px rgba(0,0,0,0.12),
+                            0 5px 15px rgba(0,0,0,0.08)
+                        `,
+                    }}
                 >
+                     {/* Binder Holes - Same as Desktop */}
+                    <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                        {[0, 1, 2].map((i) => (
+                            <div 
+                                key={i} 
+                                className="w-4 h-4 rounded-full bg-white"
+                                style={{
+                                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+
                      {/* Top Half: Illustration Area */}
-                     <div className="h-[55%] w-full relative flex items-center justify-center pt-4">
-                        <div className="relative w-[250px] h-[250px]">
+                     <div className="h-[55%] w-full relative flex items-center justify-center pt-8">
+                        <div className="relative w-[85%] h-[85%]">
                             <Image 
                                 src={step.image} 
                                 alt={step.title}
@@ -636,37 +661,44 @@ function HowItWorksSection() {
                      </div>
 
                      {/* Bottom Half: Text Content */}
-                     <div className={`h-[45%] w-full px-6 pt-2 pb-6 flex flex-col ${step.textColor} relative z-10`}>
-                        <h3 className="font-bold text-[22px] leading-tight mb-3">
+                     <div className="h-[45%] w-full px-6 pt-0 pb-28 flex flex-col text-center relative z-10 justify-end">
+                        <h3 className={`font-black text-[22px] leading-tight mb-3 ${textColor}`}>
                             {step.title}
                         </h3>
-                        <p className="text-[14px] leading-snug opacity-90 font-medium">
+                        <p className={`text-[15px] leading-relaxed font-semibold opacity-90 ${descColor} max-w-[85%] mx-auto`}>
                             {step.desc}
                         </p>
                      </div>
 
-                     {/* Folded Corner Effect - 1:1 Match with Carousel Section */}
-                     <div className="absolute bottom-0 right-0 w-[80px] h-[80px]">
-                        {/* The Fold itself (Dark Shape)
-                            - "Kiri atas lancip" -> Top-Left Sharp (rounded-tl-none)
-                            - "Kanan bawah rounded" -> Bottom-Right Rounded (rounded-br-[2rem])
-                        */}
-                        <div className={`absolute bottom-0 right-0 w-[80px] h-[80px] ${step.cornerColor} rounded-br-[2rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.15)] z-20`}></div>
+                     {/* Folded Corner - EXACT Desktop CSS (Triangle Hack) */}
+                     <div className="absolute bottom-0 right-0 w-[80px] h-[80px] drop-shadow-[-4px_-4px_6px_rgba(0,0,0,0.15)]">
+                        {/* Shadow Triangle (Back) */}
+                        <div 
+                            className="absolute bottom-0 right-0 w-0 h-0"
+                            style={{
+                                borderStyle: 'solid',
+                                borderWidth: '0 0 80px 80px',
+                                borderColor: 'transparent transparent rgba(0,0,0,0.25) transparent',
+                            }}
+                        ></div>
                         
-                        {/* Masking the card corner behind isn't strictly necessary if the fold covers it,
-                            but putting a container-bg colored block behind helps if there are gaps or for alpha blending.
-                            Wait, the container BG here is WHITE (the section bg), NOT the card BG.
-                            So we mask it with WHITE.
-                        */}
-                        <div className="absolute bottom-0 right-0 w-[80px] h-[80px] bg-white rounded-br-[2.5rem] z-10"></div>
+                        {/* Fold Triangle (Flap) */}
+                        <div 
+                            className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                            style={{
+                                borderStyle: 'solid',
+                                borderWidth: '80px 80px 0 0',
+                                borderColor: `${step.foldColor} transparent transparent transparent`,
+                            }}
+                        ></div>
                      </div>
                 </div>
             ))}
              <div className="w-2 shrink-0"></div>
         </div>
 
-         {/* Navigation Buttons - Right Aligned (Consistent with previous section) */}
-         <div className="w-full flex justify-end gap-4 px-6 mt-4">
+         {/* Navigation Buttons */}
+         <div className="w-full flex justify-end gap-4 px-6 mt-2">
             <button 
                 onClick={() => scroll('left')}
                 className="w-12 h-12 bg-white rounded-full shadow-lg border border-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-50 active:scale-95 transition-all"
