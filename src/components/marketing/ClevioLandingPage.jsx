@@ -908,28 +908,62 @@ function CTASection() {
     return (
         <section className="w-full bg-white py-12 px-4 md:px-8 flex justify-center z-20 relative mb-[-40px]">
             <div className="container mx-auto max-w-6xl">
-                <div className="w-full bg-[#E68A44] rounded-[2.5rem] py-12 px-6 md:py-16 md:px-12 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
-                     {/* Decorative Circles */}
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-black/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+                {/* 3D Sticky Note CTA - Gold/Orange Paper */}
+                <div className="w-full bg-[#f4d06f] rounded-[2.5rem] py-12 px-6 md:py-20 md:px-12 flex flex-col items-center text-center relative overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.15),0_10px_20px_rgba(0,0,0,0.1)] group">
+                     
+                    {/* Binder Holes - Top Center */}
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-6 z-20">
+                        {[0, 1, 2, 3].map((i) => (
+                            <div 
+                                key={i} 
+                                className="w-6 h-6 rounded-full bg-white"
+                                style={{
+                                    boxShadow: 'inset 3px 3px 6px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                                }}
+                            ></div>
+                        ))}
+                    </div>
 
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-4 relative z-10">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#2D2216] leading-tight mb-6 relative z-10 pt-8">
                         Bangun tim <br/>
                         staf AI Anda
                     </h2>
                     
-                    <p className="text-white/90 text-sm md:text-base font-medium mb-8 max-w-xl leading-relaxed relative z-10">
+                    <p className="text-[#4A3C2F] text-sm md:text-base font-bold mb-10 max-w-xl leading-relaxed relative z-10 opacity-90">
                         Mulai transformasi digital bisnis Anda hari ini. Gratis untuk memulai,
                         tidak perlu kartu kredit.
                     </p>
 
-                    <button className="px-10 py-3 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-extrabold rounded-full text-base shadow-lg hover:shadow-xl active:scale-[0.98] transition-all relative z-10">
+                    <button className="px-12 py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-lg shadow-xl hover:scale-105 hover:bg-black active:scale-95 transition-all duration-300 relative z-10">
                         Mulai Gratis
                     </button>
 
-                    <p className="text-white/80 text-[10px] md:text-xs font-medium mt-4 relative z-10">
+                    <p className="text-[#4A3C2F]/70 text-[10px] md:text-xs font-bold mt-6 relative z-10">
                         Tidak perlu kartu kredit • Setup dalam 5 menit • Cancel kapan saja
                     </p>
+
+                     {/* Folded Corner Effect - 3D Peel */}
+                     <div className="absolute bottom-0 right-0 w-[120px] h-[120px] drop-shadow-[-4px_-4px_8px_rgba(0,0,0,0.15)] z-20">
+                            {/* Shadow Triangle (The Peel) */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '0 0 120px 120px',
+                                    borderColor: 'transparent transparent rgba(0,0,0,0.2) transparent',
+                                }}
+                            ></div>
+                            
+                            {/* Fold Triangle (The Flap) - Slightly darker gold */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '120px 120px 0 0',
+                                    borderColor: `#d6b048 transparent transparent transparent`, 
+                                }}
+                            ></div>
+                     </div>
                 </div>
             </div>
         </section>
