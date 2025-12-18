@@ -129,7 +129,6 @@ export default function ClevioLandingPage() {
                     {/* LEFT COLUMN: Text & Input */}
                     <div className="w-full md:w-1/2 lg:max-w-2xl pl-4 md:pl-12 lg:pl-16 relative z-20 flex flex-col justify-center h-full">
                         
-                        {/* Logo - Clean and Proportional */}
                         {/* Logo - Absolute Position to avoid pushing text down */}
                         <motion.div 
                             initial={{ opacity: 0, y: -20 }}
