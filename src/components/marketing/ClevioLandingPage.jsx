@@ -126,60 +126,58 @@ export default function ClevioLandingPage() {
 }
 
 function UseCasesSection() {
+  // Unified text color: Dark Espresso Brown - works on all pastel backgrounds
+  const textColor = "text-[#2D2216]";
+  const descColor = "text-[#4A3C2F]";
+
   const cards = [
     {
-        icon: <MessageSquare className="w-6 h-6 text-black" />,
+        icon: <MessageSquare className="w-6 h-6 text-[#5D4E37]" />,
         title: "Customer Service",
         desc: "Layani pelanggan 24/7 dengan respons cepat dan akurat",
-        bg: "bg-[#F2F2F2]", 
-        foldColor: "bg-[#9E9E9E]",
-        iconBg: "bg-white",
-        text: "text-black"
+        bg: "#F2F2F2",
+        foldColor: "#CFCFCF",
+        holeShadow: "rgba(0,0,0,0.15)",
     },
     {
-        icon: <ShoppingCart className="w-6 h-6 text-black" />,
+        icon: <ShoppingCart className="w-6 h-6 text-[#5D4E37]" />,
         title: "Sales Asistant",
         desc: "Tingkatkan penjualan dengan rekomendasi produk yang tepat",
-        bg: "bg-[#90A4AE]", 
-        foldColor: "bg-[#546E7A]",
-        iconBg: "bg-white/30",
-        text: "text-black"
+        bg: "#A8C5D4",
+        foldColor: "#86A8B8",
+        holeShadow: "rgba(0,0,0,0.2)",
     },
     {
-        icon: <Headset className="w-6 h-6 text-black" />,
+        icon: <Headset className="w-6 h-6 text-[#5D4E37]" />,
         title: "Support Agent",
         desc: "Berikan dukungan teknis yang efisien dan profesional",
-        bg: "bg-[#FFF59D]", 
-        foldColor: "bg-[#AFB42B]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#FFF59D",
+        foldColor: "#E8D86A",
+        holeShadow: "rgba(0,0,0,0.12)",
     },
     {
-        icon: <TrendingUp className="w-6 h-6 text-black" />,
+        icon: <TrendingUp className="w-6 h-6 text-[#5D4E37]" />,
         title: "Marketing Assistant",
         desc: "Otomatisasi kampanye marketing dan analisis data",
-        bg: "bg-[#A5D6A7]", 
-        foldColor: "bg-[#558B2F]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#9DC99D",
+        foldColor: "#7AAF7A",
+        holeShadow: "rgba(0,0,0,0.15)",
     },
     {
-        icon: <Users className="w-6 h-6 text-black" />,
+        icon: <Users className="w-6 h-6 text-[#5D4E37]" />,
         title: "HR Assistant",
         desc: "Kelola rekrutmen dan onboarding karyawan dengan mudah",
-        bg: "bg-[#F48FB1]", 
-        foldColor: "bg-[#AD1457]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#F5B8CF",
+        foldColor: "#D898B0",
+        holeShadow: "rgba(0,0,0,0.12)",
     },
     {
-        icon: <FileText className="w-6 h-6 text-black" />,
+        icon: <FileText className="w-6 h-6 text-[#5D4E37]" />,
         title: "Admin Assistant",
         desc: "Atur jadwal, dokumen, dan tugas administratif lainnya",
-        bg: "bg-[#FFCC80]", 
-        foldColor: "bg-[#EF6C00]",
-        iconBg: "bg-white/40",
-        text: "text-black"
+        bg: "#F5C896",
+        foldColor: "#D8A870",
+        holeShadow: "rgba(0,0,0,0.15)",
     }
   ];
 
@@ -199,31 +197,72 @@ function UseCasesSection() {
                 {cards.map((card, idx) => (
                     <div 
                         key={idx}
-                        className={`relative w-full h-[260px] ${card.bg} rounded-[2.5rem] p-8 flex flex-col shadow-lg transition-transform hover:-translate-y-2 duration-300`}
+                        className="relative w-full h-[260px] rounded-[2rem] p-8 flex flex-col transition-all duration-500 hover:-translate-y-3 group cursor-pointer overflow-hidden"
+                        style={{ 
+                            backgroundColor: card.bg,
+                            boxShadow: `
+                                0 15px 35px rgba(0,0,0,0.12),
+                                0 5px 15px rgba(0,0,0,0.08)
+                            `,
+                        }}
                     >
-                         {/* Binder Holes */}
-                        <div className="absolute top-5 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
-                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
-                            <div className="w-4 h-4 bg-white rounded-full border-[1.5px] border-black/5 shadow-sm"></div>
+                         {/* Binder Holes - WHITE with Stronger INNER SHADOW (visible on all colors) */}
+                        <div className="absolute top-5 left-1/2 -translate-x-1/2 flex gap-4 z-20">
+                            {[0, 1, 2].map((i) => (
+                                <div 
+                                    key={i} 
+                                    className="w-4 h-4 rounded-full bg-white"
+                                    style={{
+                                        boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(0,0,0,0.2)'
+                                    }}
+                                ></div>
+                            ))}
                         </div>
 
-                        <div className="flex flex-col gap-5 mt-4 relative z-10">
-                            <div className={`w-14 h-14 ${card.iconBg} rounded-[1.2rem] flex items-center justify-center shadow-sm`}>
+                        <div className="flex flex-col gap-5 mt-6 relative z-10">
+                            {/* Icon Box */}
+                            <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                                style={{
+                                    backgroundColor: card.bg,
+                                    boxShadow: `
+                                        3px 3px 8px rgba(0,0,0,0.12),
+                                        -2px -2px 6px rgba(255,255,255,0.5),
+                                        inset 1px 1px 2px rgba(255,255,255,0.3)
+                                    `
+                                }}
+                            >
                                 {card.icon}
                             </div>
                             <div>
-                                <h3 className={`font-black text-2xl mb-2 ${card.text} leading-tight`}>{card.title}</h3>
-                                <p className={`text-[15px] font-semibold leading-relaxed w-[90%] ${card.text} opacity-70`}>
+                                <h3 className={`font-black text-xl mb-2 ${textColor} leading-tight`}>{card.title}</h3>
+                                <p className={`text-[14px] font-semibold leading-relaxed w-[85%] ${descColor}`}>
                                     {card.desc}
                                 </p>
                             </div>
                         </div>
 
-                         {/* Folded Corner Effect */}
-                         <div className="absolute bottom-0 right-0 w-[80px] h-[80px]">
-                            <div className={`absolute bottom-0 right-0 w-[80px] h-[80px] ${card.foldColor} rounded-br-[2.5rem] rounded-tl-none shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] z-20`}></div>
-                            <div className="absolute bottom-0 right-0 w-[80px] h-[80px] bg-white rounded-br-[3rem] z-10"></div>
+                         {/* Folded Corner using Borders for Perfect Triangles */}
+                         <div className="absolute bottom-0 right-0 w-[80px] h-[80px] drop-shadow-[-4px_-4px_6px_rgba(0,0,0,0.15)]">
+                            {/* Shadow Triangle (Bottom-Right) - The 'Peel' or 'Back' */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '0 0 80px 80px',
+                                    borderColor: 'transparent transparent rgba(0,0,0,0.25) transparent',
+                                }}
+                            ></div>
+                            
+                            {/* Fold Triangle (Top-Left) - The 'Flap' */}
+                            <div 
+                                className="absolute bottom-0 right-0 w-0 h-0 z-20"
+                                style={{
+                                    borderStyle: 'solid',
+                                    borderWidth: '80px 80px 0 0',
+                                    borderColor: `${card.foldColor} transparent transparent transparent`,
+                                }}
+                            ></div>
                          </div>
                     </div>
                 ))}
@@ -232,6 +271,7 @@ function UseCasesSection() {
     </section>
   );
 }
+
 
 function HowItWorksSection() {
   const steps = [
