@@ -240,6 +240,60 @@ export default function MobileLanding() {
   const chatContainerRef = useRef(null); // Ref for message container
   const chatCardRef = useRef(null); // Ref for the main Chat Card wrapper
 
+  // === NEW: Chat Session & Phone States ===
+  const [chatSessionId, setChatSessionId] = useState("");
+  const [agentName, setAgentName] = useState("Clevio Assistant");
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneMessages, setPhoneMessages] = useState([]);
+
+  // Generate or Retrieve chatSessionId from sessionStorage on mount
+  useEffect(() => {
+    let storedSessionId = sessionStorage.getItem('chatSessionId');
+    if (!storedSessionId) {
+      storedSessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      sessionStorage.setItem('chatSessionId', storedSessionId);
+      console.log("[Mobile] Generated new chatSessionId:", storedSessionId);
+    } else {
+      console.log("[Mobile] Retrieved existing chatSessionId:", storedSessionId);
+    }
+    setChatSessionId(storedSessionId);
+  }, []);
+
+  // Initialize Phone Chat Greeting when finished
+  useEffect(() => {
+    if (status === 'finished') {
+       setPhoneMessages([
+           { role: 'assistant', text: `Halo! 👋 Saya ${agentName}. Saya siap membantu Anda.` },
+           { role: 'assistant', text: "Ada yang bisa saya bantu?" }
+       ]);
+    }
+  }, [status, agentName]);
+
+  // POLLING LOGIC: Check for Interview Finish from Server
+  useEffect(() => {
+    if (status !== 'interviewing' || !chatSessionId) return;
+
+    const pollInterval = setInterval(async () => {
+        try {
+            const res = await fetch(`/api/interview/finish?chatSessionId=${chatSessionId}`);
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && json.data.agentName) {
+                    console.log("[Mobile Polling] Interview Finished:", json.data);
+                    sessionStorage.setItem('clevioAgentData', JSON.stringify(json.data));
+                    setAgentName(json.data.agentName);
+                    setStatus("finished");
+                    setIsTyping(false);
+                }
+            }
+        } catch (error) {
+            console.error("Polling Error:", error);
+        }
+    }, 3000);
+
+    return () => clearInterval(pollInterval);
+  }, [status, chatSessionId]);
+
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
         chatContainerRef.current.scrollTo({
@@ -277,48 +331,112 @@ export default function MobileLanding() {
     }
   }, [status]);
 
-  const handleSend = () => {
+  const sendToWebhook = async (payload) => {
+    try {
+      const response = await fetch("https://n8n.srv651498.hstgr.cloud/webhook/interviewAgent-landingpage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Webhook failed");
+      return await response.json();
+    } catch (error) {
+      console.error("Webhook Error:", error);
+      return { output: "Maaf, terjadi kesalahan. Silakan coba lagi." };
+    }
+  };
+
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
     // Synchronous focus to force keyboard open on mobile
     inputRef.current?.focus();
 
-    // Add user message
-    const userMsg = { role: "user", text: inputValue };
-    setMessages((prev) => [...prev, userMsg]);
+    const currentInput = inputValue;
     setInputValue("");
+
+    // Add user message
+    const userMsg = { role: "user", text: currentInput };
+    setMessages((prev) => [...prev, userMsg]);
     setStatus("interviewing");
     setIsTyping(true);
-    setIsChatOpen(true); // Ensure open on send
+    setIsChatOpen(true);
 
     // Force the view to scroll the Entire Chat Card to Center
-    // This ensures "KEATAS" / "CHAT INPUT USER PERTAMA" behavior
     setTimeout(() => {
         chatCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300); // 300ms delay for layout transition
+    }, 300);
     
-    // Dummy Interview Logic
-    setTimeout(() => {
-      let aiResponseText = "";
-      if (messages.length === 0) {
-        aiResponseText = "Menarik! Apa detail tugas spesifik yang harus dilakukan oleh staf AI ini?";
-      } else if (messages.length === 2) {
-        aiResponseText = "Baik, saya mengerti kebutuhan Anda. Sistem kami sedang menyiapkan demo yang cocok.";
-      } else {
-        // Finish condition
-        setIsTyping(false);
-        setStatus("finished");
-        return;
-      }
+    // Build payload
+    let payload = {};
+    if (messages.length === 0) {
+        // First Message
+        payload = {
+            chatSessionId: chatSessionId,
+            firstMessage: `Halo saya mau bikin agent AI ${currentInput}`,
+            message: null
+        };
+    } else {
+        // Subsequent Messages
+        payload = {
+            chatSessionId: chatSessionId,
+            firstMessage: null,
+            message: currentInput
+        };
+    }
 
-      setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
-      setIsTyping(false);
-    }, 1500); 
+    // Send to n8n
+    const data = await sendToWebhook(payload);
+    
+    // Process Response
+    const responseData = Array.isArray(data) ? data[0] : data;
+    const aiResponseText = responseData.output || responseData.message || responseData.text || (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+
+    setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
+    setIsTyping(false);
+  };
+
+  // Phone Chat Handler
+  const handlePhoneSend = async () => {
+    if (!phoneInput.trim()) return;
+
+    const currentInput = phoneInput;
+    setPhoneInput("");
+    
+    setPhoneMessages((prev) => [...prev, { role: 'user', text: currentInput }]);
+
+    const storedData = sessionStorage.getItem('clevioAgentData');
+    const agentData = storedData ? JSON.parse(storedData) : {};
+
+    const payload = {
+        chatSessionId: chatSessionId,
+        agentId: agentData.agentId,
+        agentName: agentData.agentName,
+        userMessage: currentInput
+    };
+
+    try {
+      const response = await fetch("https://n8n.srv651498.hstgr.cloud/webhook/webhook-chatAgent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Webhook failed");
+      const data = await response.json();
+      
+      const responseData = Array.isArray(data) ? data[0] : data;
+      const aiResponseText = responseData.output || responseData.message || responseData.text || (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+      
+      setPhoneMessages((prev) => [...prev, { role: 'assistant', text: aiResponseText }]);
+    } catch (error) {
+      console.error("Phone Webhook Error:", error);
+      setPhoneMessages((prev) => [...prev, { role: 'assistant', text: "Maaf, terjadi kesalahan." }]);
+    }
   };
 
   const handleInputFocus = () => {
       // Only expand on focus if we are already interviewing.
-      // If initial, we keep it collapsed as a pill until they hit Send.
       if (status !== 'initial') {
         setIsChatOpen(true);
       }
