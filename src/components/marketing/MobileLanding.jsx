@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Menu, Send, BatteryMedium, Wifi, Signal, Check, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText, ArrowLeft, ArrowRight, Clock, Brain, ShieldCheck, Zap, Globe, User, Bot, Gift, Star, Rocket } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeaderClock = () => {
   const [time, setTime] = useState("");
@@ -192,6 +194,29 @@ function WaitingListSection() {
 }
 
 export default function MobileLanding() {
+  const router = useRouter();
+  const { startTrialSession } = useAuth();
+  const [isTrialLoading, setIsTrialLoading] = useState(false);
+
+  const handleStartTrial = async () => {
+    try {
+      setIsTrialLoading(true);
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to start trial");
+
+      const data = await res.json();
+      startTrialSession(data);
+      router.push("/trial/templates");
+    } catch (error) {
+      console.error("Trial Error:", error);
+    } finally {
+      setIsTrialLoading(false);
+    }
+  };
 
   const [status, setStatus] = useState("initial"); // initial, interviewing, finished
   const [isChatOpen, setIsChatOpen] = useState(false); // Controls chat expansion
@@ -646,9 +671,9 @@ export default function MobileLanding() {
         <FeatureSection />
       <TestimonialSection />
       <ComparisonSection />
-      <PricingSection />
+      <PricingSection onStartTrial={handleStartTrial} />
         <WaitingListSection />
-      <CTASection />
+      <CTASection onStartTrial={handleStartTrial} />
       <FooterSection />
 
       </div>
@@ -1337,17 +1362,19 @@ function TestimonialSection() {
 }
 
 // Pricing Section: Wooden Board Aesthetic
-function PricingSection() {
+function PricingSection({ onStartTrial }) {
   const plans = [
     {
-      name: "Gratis",
-      desc: "Sempurna untuk mencoba Staff AI",
+      name: "Starter",
+      desc: "Untuk individu atau bisnis kecil",
+      // price: "Gratis", // No price shown per request
+      customTitle: "Gratis Selamanya",
+      period: null,
       features: [
         "1 Staff AI",
-        "100 percakapan/bulan",
-        "Fitur dasar",
-        "Email support",
-        "Dashboard analytics"
+        "100 Percakapan/bln",
+        "WhatsApp Integration",
+        "Basic Support"
       ],
       cta: "Coba Gratis"
     },
@@ -1458,7 +1485,15 @@ function PricingSection() {
                         </div>
 
                         {/* 3D Pill Button */}
-                        <button className="w-full py-3.5 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-bold rounded-full text-[15px] shadow-[0_4px_6px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.08),inset_0_-2px_4px_rgba(0,0,0,0.1)] border border-gray-100 hover:to-[#E0E0E0] active:scale-[0.98] active:shadow-inner transition-all mt-auto relative overflow-hidden group">
+                       {/* 3D Pill Button */}
+                        <button 
+                            onClick={() => {
+                                if (plan.cta === "Coba Gratis" || plan.cta === "Mulai Gratis") {
+                                    onStartTrial();
+                                }
+                            }}
+                            className="w-full py-3.5 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-bold rounded-full text-[15px] shadow-[0_4px_6px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.08),inset_0_-2px_4px_rgba(0,0,0,0.1)] border border-gray-100 hover:to-[#E0E0E0] active:scale-[0.98] active:shadow-inner transition-all mt-auto relative overflow-hidden group"
+                        >
                            <span className="relative z-10">{plan.cta}</span>
                            <div className="absolute inset-0 bg-white/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </button>
@@ -1561,7 +1596,7 @@ function ComparisonSection() {
 }
 
 // CTA Section: Gold Sticky Note with Folded Corner
-function CTASection() {
+function CTASection({ onStartTrial }) {
   return (
     <div className="w-full bg-white pb-20 pt-10 px-4 flex justify-center relative z-20 mb-[-50px]">
         {/* Gold/Orange Card Container */}
@@ -1588,7 +1623,10 @@ function CTASection() {
                 Mulai transformasi digital bisnis Anda hari ini. Gratis untuk memulai, <br/> tidak perlu kartu kredit.
             </p>
 
-            <button className="w-full py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-[16px] shadow-xl active:scale-[0.98] transition-all relative z-10 mb-8">
+            <button 
+                onClick={onStartTrial}
+                className="w-full py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-[16px] shadow-xl active:scale-[0.98] transition-all relative z-10 mb-8"
+            >
                 Mulai Gratis
             </button>
 

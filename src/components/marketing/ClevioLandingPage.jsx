@@ -5,6 +5,8 @@ import { Send, MessageSquare, ShoppingCart, Headset, TrendingUp, Users, FileText
 import Image from "next/image";
 import Script from "next/script";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SOFTWARE_APP_SCHEMA = {
   "@context": "https://schema.org",
@@ -36,6 +38,30 @@ const HeaderClock = () => {
   };
 
 export default function ClevioLandingPage() {
+  const router = useRouter();
+  const { startTrialSession } = useAuth();
+  const [isTrialLoading, setIsTrialLoading] = useState(false);
+
+  const handleStartTrial = async () => {
+    try {
+      setIsTrialLoading(true);
+      const res = await fetch("/api/trial", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) throw new Error("Failed to start trial");
+
+      const data = await res.json();
+      startTrialSession(data);
+      router.push("/trial/templates");
+    } catch (error) {
+      console.error("Trial Error:", error);
+    } finally {
+      setIsTrialLoading(false);
+    }
+  };
+
   const [status, setStatus] = useState("initial"); // initial, interviewing, finished
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
@@ -50,37 +76,156 @@ export default function ClevioLandingPage() {
     }
   }, [messages, isTyping]);
 
+  const [ip, setIp] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [agentName, setAgentName] = useState("Clevio Assistant"); // Default name
 
-  const handleSend = () => {
+  // Fetch IP on mount
+  useEffect(() => {
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => setIp(data.ip))
+      .catch((err) => console.error("IP Fetch Error:", err));
+  }, []);
+
+  // Phone Chat State
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneMessages, setPhoneMessages] = useState([]);
+
+  // Initialize Phone Chat Greeting when finished
+  useEffect(() => {
+    if (status === 'finished') {
+       setPhoneMessages([
+           { role: 'assistant', text: `Halo James 👋, saya ${agentName}. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.` },
+           { role: 'assistant', text: "Dari follow-up pelanggan, mencatat order, sampai menagih invoice—semua bisa saya kerjakan 24/7 tanpa lelah." },
+           { role: 'assistant', text: "Ada yang bisa saya bantu mulai sekarang?" }
+       ]);
+    }
+  }, [status, agentName]);
+
+  // POLLING LOGIC: Check for Interview Finish from Server
+  useEffect(() => {
+    // Only poll if we are in 'interviewing' status
+    if (status !== 'interviewing') return;
+
+    const pollInterval = setInterval(async () => {
+        try {
+            const res = await fetch("/api/interview/finish");
+            if (res.ok) {
+                const json = await res.json();
+                if (json.data && json.data.agentName) {
+                    console.log("[Polling] Interview Finished:", json.data);
+                    
+                    // Save to SessionStorage
+                    sessionStorage.setItem('clevioAgentData', JSON.stringify(json.data));
+                    
+                    setAgentName(json.data.agentName);
+                    setStatus("finished");
+                    setIsTyping(false);
+                }
+            }
+        } catch (error) {
+            console.error("Polling Error:", error);
+        }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [status]);
+
+  const handlePhoneSend = async () => {
+    if (!phoneInput.trim()) return;
+
+    const currentInput = phoneInput;
+    setPhoneInput(""); // Clear input
+    
+    // Add user message to UI
+    setPhoneMessages((prev) => [...prev, { role: 'user', text: currentInput }]);
+
+    // Retrieve Agent Data
+    const storedData = sessionStorage.getItem('clevioAgentData');
+    const agentData = storedData ? JSON.parse(storedData) : {};
+
+    const payload = {
+        agentId: agentData.agentId,
+        agentName: agentData.agentName,
+        userMessage: currentInput
+    };
+
+    try {
+      // Different Endpoint for Phone Chat
+      const response = await fetch("https://n8n.srv651498.hstgr.cloud/webhook/webhook-chatAgent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Webhook failed");
+      const data = await response.json();
+      
+      // Process Response
+      const aiResponseText = data.output || data.message || data.text || (typeof data === 'string' ? data : JSON.stringify(data));
+      setPhoneMessages((prev) => [...prev, { role: 'assistant', text: aiResponseText }]);
+    } catch (error) {
+      console.error("Phone Webhook Error:", error);
+      setPhoneMessages((prev) => [...prev, { role: 'assistant', text: "Maaf, terjadi kesalahan koneksi." }]);
+    }
+  };
+
+  /* ... sendToWebhook and handleSend remain unchanged ... */
+  const sendToWebhook = async (payload) => {
+    try {
+      const response = await fetch("https://n8n.srv651498.hstgr.cloud/webhook/interviewAgent-landingpage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Webhook failed");
+      return await response.json();
+    } catch (error) {
+      console.error("Webhook Error:", error);
+      return { output: "Maaf, terjadi kesalahan. Silakan coba lagi." }; // Fallback
+    }
+  };
+
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    // Add user message
-    const userMsg = { role: "user", text: inputValue };
-    setMessages((prev) => [...prev, userMsg]);
-    setInputValue("");
+    const currentInput = inputValue;
+    setInputValue(""); // Clear input immediately
     
+    // Add user message to UI immediately
+    const userMsg = { role: "user", text: currentInput };
+    setMessages((prev) => [...prev, userMsg]);
+    setIsTyping(true);
+    setIsSending(true);
+
+    let payload = {};
+
     if (status === 'initial') {
         setStatus("interviewing");
+        // First Message Payload
+        payload = {
+            ip: ip,
+            firstMessage: `Halo saya mau bikin agent AI ${currentInput}`,
+            message: null
+        };
+    } else {
+        // Subsequent Message Payload
+        payload = {
+            ip: ip,
+            firstMessage: null,
+            message: currentInput
+        };
     }
-    setIsTyping(true);
 
-    // Dummy Interview Logic
-    setTimeout(() => {
-      let aiResponseText = "";
-      if (messages.length === 0) {
-        aiResponseText = "Menarik! Apa detail tugas spesifik yang harus dilakukan oleh staf AI ini?";
-      } else if (messages.length === 2) {
-        aiResponseText = "Baik, saya mengerti kebutuhan Anda. Sistem kami sedang menyiapkan demo yang cocok.";
-      } else {
-        // Finish condition
-        setIsTyping(false);
-        setStatus("finished");
-        return;
-      }
-
-      setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
-      setIsTyping(false);
-    }, 1500); 
+    // Send to n8n
+    const data = await sendToWebhook(payload);
+    
+    // Process Response (Standard Chat)
+    const aiResponseText = data.output || data.message || data.text || (typeof data === 'string' ? data : JSON.stringify(data));
+    setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
+    setIsTyping(false);
+    setIsSending(false);
   };
 
 
@@ -314,7 +459,7 @@ export default function ClevioLandingPage() {
                                                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#C0A865] border-2 border-white rounded-full"></div>
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">Clevio Assistant</h3>
+                                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">{agentName}</h3>
                                                     <p className="text-xs text-[#C0A865] font-medium">Online • Mengetik...</p>
                                                 </div>
                                             </div>
@@ -323,36 +468,40 @@ export default function ClevioLandingPage() {
                                             <div className="bg-[#FAF6F1] h-[380px] p-4 space-y-4 overflow-y-auto font-sans text-xs">
                                                 <div className="text-[10px] text-center text-[#8D7F71] mb-4 font-medium">Hari ini</div>
                                                 
-                                                <div className="flex justify-start">
-                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
-                                                        Halo James 👋, saya <span className="font-semibold text-[#5D4037]">Clevio</span>. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.
+                                                {phoneMessages.map((msg, idx) => (
+                                                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                                        <div className={`p-3 px-3.5 rounded-2xl max-w-[90%] leading-relaxed shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
+                                                            msg.role === 'user'
+                                                            ? 'bg-[#5D4037] text-white rounded-br-none'
+                                                            : 'bg-white text-[#2D2216] rounded-tl-none border border-[#E0D4BC]'
+                                                        }`}>
+                                                            {msg.role === 'assistant' && idx === 0 ? (
+                                                                <>Halo James 👋, saya <span className="font-semibold text-[#5D4037]">{agentName}</span>. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.</>
+                                                            ) : (
+                                                                msg.text
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-
-                                                <div className="flex justify-start">
-                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
-                                                        Dari <b>follow-up pelanggan</b>, <b>mencatat order</b>, sampai <b>menagih invoice</b>—semua bisa saya kerjakan 24/7 tanpa lelah.
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex justify-start">
-                                                    <div className="bg-white p-3 px-3.5 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[90%]">
-                                                        Ada yang bisa saya bantu mulai sekarang?
-                                                    </div>
-                                                </div>
+                                                ))}
+                                                <div ref={messagesEndRef} />
                                             </div>
 
-                                            {/* Fake Input Footer */}
+                                            {/* Fake Input Footer -> Interative Input */}
                                             <div className="p-3 bg-white border-t border-[#E0D4BC] absolute bottom-0 left-0 right-0 z-20">
                                                 <div className="relative flex items-center">
                                                     <input 
-                                                        disabled
+                                                        value={phoneInput}
+                                                        onChange={(e) => setPhoneInput(e.target.value)}
+                                                        onKeyDown={(e) => e.key === "Enter" && handlePhoneSend()}
                                                         placeholder="Tulis pesan..."
-                                                        className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-[10px] rounded-full py-3.5 pl-4 pr-10 outline-none placeholder:text-[#8D7F71]"
+                                                        className="w-full bg-[#FAF6F1] border border-[#E0D4BC] text-[#2D2216] text-[10px] rounded-full py-3.5 pl-4 pr-10 outline-none placeholder:text-[#8D7F71] focus:ring-1 focus:ring-[#5D4037]"
                                                     />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#5D4037] text-white rounded-full shadow-md">
+                                                    <button 
+                                                        onClick={handlePhoneSend}
+                                                        className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-[#5D4037] text-white rounded-full shadow-md hover:bg-[#4E342E] active:scale-95 transition-all"
+                                                    >
                                                         <Send className="w-3.5 h-3.5" />
-                                                    </div>
+                                                    </button>
                                                 </div>
                                                 <div className="mx-auto w-24 h-1 bg-gray-300 rounded-full mt-4"></div>
                                             </div>
@@ -373,9 +522,11 @@ export default function ClevioLandingPage() {
            <FeatureSection />
            <TestimonialSection />
            <ComparisonSection />
-           <PricingSection />
+           <TestimonialSection />
+           <ComparisonSection />
+           <PricingSection onStartTrial={handleStartTrial} />
            <WaitingListSection />
-           <CTASection />
+           <CTASection onStartTrial={handleStartTrial} />
            <FooterSection />
         </main>
       </div>
@@ -955,7 +1106,7 @@ function ComparisonSection() {
     );
 }
 
-function PricingSection() {
+function PricingSection({ onStartTrial }) {
     const plans = [
         {
           name: "Gratis",
@@ -1064,7 +1215,14 @@ function PricingSection() {
                                     ))}
                                 </div>
 
-                                <button className="w-full py-3 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-bold rounded-full text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.08),inset_0_-2px_4px_rgba(0,0,0,0.1)] border border-gray-100 hover:to-[#E0E0E0] active:scale-[0.98] transition-all">
+                                <button 
+                                    onClick={() => {
+                                        if (["Coba Sekarang", "Coba Gratis", "Mulai Gratis"].includes(plan.cta)) {
+                                            onStartTrial();
+                                        }
+                                    }}
+                                    className="w-full py-3 bg-gradient-to-b from-white to-[#F0F0F0] text-black font-bold rounded-full text-base shadow-[0_4px_6px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.08),inset_0_-2px_4px_rgba(0,0,0,0.1)] border border-gray-100 hover:to-[#E0E0E0] active:scale-[0.98] transition-all"
+                                >
                                     {plan.cta}
                                 </button>
                              </div>
@@ -1246,7 +1404,7 @@ function WaitingListSection() {
     );
 }
 
-function CTASection() {
+function CTASection({ onStartTrial }) {
     return (
         <section className="w-full bg-white py-12 px-4 md:px-8 flex justify-center z-20 relative mb-[-40px]">
             <div className="container mx-auto max-w-6xl">
@@ -1276,7 +1434,10 @@ function CTASection() {
                         tidak perlu kartu kredit.
                     </p>
 
-                    <button className="px-12 py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-lg shadow-xl hover:scale-105 hover:bg-black active:scale-95 transition-all duration-300 relative z-10">
+                    <button 
+                        onClick={onStartTrial}
+                        className="px-12 py-4 bg-[#2D2216] text-white font-extrabold rounded-2xl text-lg shadow-xl hover:scale-105 hover:bg-black active:scale-95 transition-all duration-300 relative z-10"
+                    >
                         Mulai Gratis
                     </button>
 
