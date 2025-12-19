@@ -71,7 +71,7 @@ function WaitingListSection() {
   return (
     <div className="w-full bg-[#f8f9fa] pb-20 pt-10 flex flex-col items-center px-4">
          {/* Sticky Note Container - Paper Look with Binder Holes (Beige) */}
-         <div className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-6 pb-12 pt-24 border border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)] relative overflow-hidden">
+         <div id="early-access-mobile" className="w-full bg-[#FDF4C8] rounded-[2.5rem] p-6 pb-12 pt-24 border border-black/5 shadow-[0_20px_40px_rgba(0,0,0,0.1)] relative overflow-hidden">
                     
              {/* Binder Holes - Top Center */}
              <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-6 z-20">
@@ -206,15 +206,26 @@ export default function MobileLanding() {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) throw new Error("Failed to start trial");
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to start trial");
+      }
+
       startTrialSession(data);
       router.push("/trial/templates");
     } catch (error) {
       console.error("Trial Error:", error);
+      alert(error.message); // Show error to user
     } finally {
       setIsTrialLoading(false);
+    }
+  };
+
+  const scrollToEarlyAccess = () => {
+    const section = document.getElementById('early-access-mobile');
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -671,7 +682,7 @@ export default function MobileLanding() {
         <FeatureSection />
       <TestimonialSection />
       <ComparisonSection />
-      <PricingSection onStartTrial={handleStartTrial} />
+      <PricingSection onStartTrial={handleStartTrial} onScrollToEarlyAccess={scrollToEarlyAccess} />
         <WaitingListSection />
       <CTASection onStartTrial={handleStartTrial} />
       <FooterSection />
@@ -1362,19 +1373,20 @@ function TestimonialSection() {
 }
 
 // Pricing Section: Wooden Board Aesthetic
-function PricingSection({ onStartTrial }) {
+function PricingSection({ onStartTrial, onScrollToEarlyAccess }) {
   const plans = [
     {
-      name: "Starter",
-      desc: "Untuk individu atau bisnis kecil",
+      name: "Gratis",
+      desc: "Sempurna untuk mencoba Staff AI",
       // price: "Gratis", // No price shown per request
-      customTitle: "Gratis Selamanya",
+      customTitle: null,
       period: null,
       features: [
         "1 Staff AI",
-        "100 Percakapan/bln",
-        "WhatsApp Integration",
-        "Basic Support"
+        "100 percakapan/bulan",
+        "Fitur dasar",
+        "Email support",
+        "Dashboard analytics"
       ],
       cta: "Coba Gratis"
     },
@@ -1488,7 +1500,9 @@ function PricingSection({ onStartTrial }) {
                        {/* 3D Pill Button */}
                         <button 
                             onClick={() => {
-                                if (plan.cta === "Coba Gratis" || plan.cta === "Mulai Gratis") {
+                                if (plan.cta === "Coba Sekarang") {
+                                    if (onScrollToEarlyAccess) onScrollToEarlyAccess();
+                                } else if (["Coba Gratis", "Mulai Gratis"].includes(plan.cta)) {
                                     onStartTrial();
                                 }
                             }}
