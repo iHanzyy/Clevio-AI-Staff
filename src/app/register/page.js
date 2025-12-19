@@ -1,11 +1,11 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, AlertCircle } from "lucide-react";
 import { apiService } from "@/lib/api";
 import { hasUsedTrialEmail } from "@/lib/trialGuard";
+import toast, { Toaster } from 'react-hot-toast';
 
 const normalizeEmail = (value) =>
   typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -17,8 +17,6 @@ function RegisterContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [showTrialUsedModal, setShowTrialUsedModal] = useState(false);
   const [trialBlockedEmail, setTrialBlockedEmail] = useState("");
   const router = useRouter();
@@ -34,10 +32,20 @@ function RegisterContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords don't match");
+      toast.error("Passwords don't match", {
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
       return;
     }
 
@@ -54,7 +62,6 @@ function RegisterContent() {
 
     setLoading(true);
     try {
-      setSuccess("");
       const registerResponse = await apiService.register(email, password);
 
       const userId =
@@ -85,14 +92,25 @@ function RegisterContent() {
         }
       }
 
-      setSuccess(
-        "Registration successful! Redirecting you to choose a plan. After settlement, use these credentials to log in."
-      );
-      setError("");
+      toast.success("Registration successful! Redirecting to payment...", {
+        duration: 3000,
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
+      
       setEmail("");
       setPassword("");
       setConfirmPassword("");
       apiService.clearLastOrderId();
+      
       setTimeout(() => {
         const params = new URLSearchParams({
           user_id: String(userId),
@@ -109,7 +127,19 @@ function RegisterContent() {
       if (err && typeof err === "object" && "message" in err && err.message) {
         message = String(err.message);
       }
-      setError(message);
+      toast.error(message, {
+        duration: 5000,
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -117,6 +147,8 @@ function RegisterContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E1] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <Toaster position="top-center" />
+      
       {/* Subtle gradient orbs - NO BLUE */}
       <div className="absolute top-[-5%] right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-gradient-to-tr from-[#2D2216]/5 to-transparent rounded-full blur-3xl opacity-30"></div>
@@ -156,28 +188,6 @@ function RegisterContent() {
                 ></div>
               ))}
             </div>
-            
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
-              >
-                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
-              </motion.div>
-            )}
-
-            {success && !error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-6 bg-emerald-50/80 backdrop-blur-sm border border-emerald-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
-              >
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                  <p className="text-sm text-emerald-700 font-medium">{success}</p>
-              </motion.div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-5 mt-6">
               {/* Email Input */}

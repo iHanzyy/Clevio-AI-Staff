@@ -2,14 +2,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function Login() {
   const [formData, setFormData] = useState({ identifier: "", password: "" });
-  const [error, setError] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showResetInfo, setShowResetInfo] = useState(false);
@@ -27,9 +25,19 @@ export default function Login() {
       searchParams.get("settlement") === "true";
 
     if (hasSettlementQuery) {
-      setInfoMessage(
-        "Payment settled. Please sign in with your registered email or phone number and password."
-      );
+      toast.success("Payment settled! Please sign in with your credentials.", {
+        duration: 5000,
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
     }
 
     const queryIdentifier =
@@ -47,12 +55,22 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     const identifier = formData.identifier.trim();
     if (!identifier) {
-      setError("Please enter your email address or phone number.");
+      toast.error("Please enter your email or phone number", {
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
       setLoading(false);
       return;
     }
@@ -62,19 +80,62 @@ export default function Login() {
 
       if (result.success) {
         if (result.is_active) {
+          toast.success("Login successful! Redirecting...", {
+            style: {
+              background: '#FFFFFF',
+              color: '#2D2216',
+              padding: '16px 20px',
+              borderRadius: '20px',
+              border: '1px solid #E0D4BC',
+              boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+              fontSize: '14px',
+              fontWeight: '600',
+            },
+          });
           router.push("/dashboard");
         } else {
-          setError(
-            "Account not activated. Please complete payment using the link sent after registration."
-          );
+          toast.error("Account not activated. Please complete payment.", {
+            duration: 6000,
+            style: {
+              background: '#FFFFFF',
+              color: '#2D2216',
+              padding: '16px 20px',
+              borderRadius: '20px',
+              border: '1px solid #E0D4BC',
+              boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+              fontSize: '14px',
+              fontWeight: '600',
+            },
+          });
         }
       } else {
-        setError(
-          result.error || "Login failed. Please check your credentials."
-        );
+        toast.error(result.error || "Login failed. Please check your credentials.", {
+          duration: 5000,
+          style: {
+            background: '#FFFFFF',
+            color: '#2D2216',
+            padding: '16px 20px',
+            borderRadius: '20px',
+            border: '1px solid #E0D4BC',
+            boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+            fontSize: '14px',
+            fontWeight: '600',
+          },
+        });
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.", {
+        style: {
+          background: '#FFFFFF',
+          color: '#2D2216',
+          padding: '16px 20px',
+          borderRadius: '20px',
+          border: '1px solid #E0D4BC',
+          boxShadow: '0 8px 24px rgba(45, 34, 22, 0.12), 0 2px 8px rgba(45, 34, 22, 0.08)',
+          fontSize: '14px',
+          fontWeight: '600',
+        },
+      });
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -88,6 +149,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FAF8F5] via-[#F5F2ED] to-[#EDE8E1] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <Toaster position="top-center" />
+      
       {/* Subtle gradient orbs - NO BLUE */}
       <div className="absolute top-[-5%] right-[10%] w-[600px] h-[600px] bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-gradient-to-tr from-[#2D2216]/5 to-transparent rounded-full blur-3xl opacity-30"></div>
@@ -127,28 +190,6 @@ export default function Login() {
                 ></div>
               ))}
             </div>
-            
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-6 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
-              >
-                  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
-              </motion.div>
-            )}
-
-            {infoMessage && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="mb-6 bg-emerald-50/80 backdrop-blur-sm border border-emerald-200/50 rounded-3xl p-4 flex items-center gap-3 shadow-sm"
-              >
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />
-                  <p className="text-sm text-emerald-700 font-medium">{infoMessage}</p>
-              </motion.div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-5 mt-6">
               {/* Email Input */}
