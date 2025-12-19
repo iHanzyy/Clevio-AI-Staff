@@ -743,41 +743,45 @@ export default function MobileLanding() {
                                     <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#C0A865] border-2 border-white rounded-full"></div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">Clevio Assistant</h3>
-                                    <p className="text-xs text-[#C0A865] font-medium">Online • Mengetik...</p>
+                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">{agentName}</h3>
+                                    <p className="text-xs text-[#C0A865] font-medium">Online</p>
                                 </div>
                             </div>
 
-                            {/* Chat Content Body - Elegant Spacing & Typography */}
-                            <div className="bg-[#FAF6F1] h-[480px] p-5 space-y-4 overflow-y-auto font-sans">
+                            {/* Chat Content Body - Dynamic Messages */}
+                            <div className="bg-[#FAF6F1] h-[400px] p-5 space-y-4 overflow-y-auto font-sans">
                                 <div className="text-xs text-center text-[#8D7F71] mb-6 font-medium">Hari ini</div>
                                 
-                                <div className="flex justify-start">
-                                    <div className="bg-white p-3.5 px-4 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[13px] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[85%]">
-                                        Halo James 👋, saya <span className="font-semibold text-[#5D4037]">Clevio</span>. Saya siap membantu mengelola tugas harian bisnis Anda secara otomatis.
+                                {phoneMessages.map((msg, idx) => (
+                                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`p-3.5 px-4 rounded-2xl max-w-[85%] text-[13px] leading-relaxed shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
+                                            msg.role === 'user'
+                                            ? 'bg-[#5D4037] text-white rounded-br-none'
+                                            : 'bg-white text-[#2D2216] rounded-tl-none border border-[#E0D4BC]'
+                                        }`}>
+                                            {msg.text}
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div className="flex justify-start">
-                                    <div className="bg-white p-3.5 px-4 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[13px] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[85%]">
-                                        Dari <b>follow-up pelanggan</b>, <b>mencatat order</b>, sampai <b>menagih invoice</b>—semua bisa saya kerjakan 24/7 tanpa lelah.
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-start">
-                                    <div className="bg-white p-3.5 px-4 rounded-2xl rounded-tl-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[13px] leading-relaxed text-[#2D2216] border border-[#E0D4BC] max-w-[85%]">
-                                        Ada yang bisa saya bantu mulai sekarang?
-                                    </div>
-                                </div>
+                                ))}
                             </div>
 
-                            {/* Fake Input Footer - Minimalist */}
+                            {/* Interactive Input Footer */}
                             <div className="p-4 bg-white border-t border-[#E0D4BC] absolute bottom-0 left-0 right-0 z-20">
-                                <div className="flex items-center gap-3 bg-[#FAF6F1] rounded-full px-5 py-3 border border-[#E0D4BC]">
-                                    <span className="text-gray-400 text-xs font-medium flex-1">Tulis pesan...</span>
-                                    <div className="w-8 h-8 bg-[#5D4037] rounded-full flex items-center justify-center text-white shadow-md">
+                                <div className="flex items-center gap-3 bg-[#FAF6F1] rounded-full px-4 py-2 border border-[#E0D4BC]">
+                                    <input 
+                                        type="text"
+                                        value={phoneInput}
+                                        onChange={(e) => setPhoneInput(e.target.value)}
+                                        onKeyDown={(e) => e.key === "Enter" && handlePhoneSend()}
+                                        placeholder="Tulis pesan..."
+                                        className="flex-1 bg-transparent text-sm text-[#2D2216] placeholder:text-gray-400 outline-none"
+                                    />
+                                    <button 
+                                        onClick={handlePhoneSend}
+                                        className="w-8 h-8 bg-[#5D4037] rounded-full flex items-center justify-center text-white shadow-md hover:bg-[#4E342E] active:scale-95 transition-all"
+                                    >
                                         <Send className="w-3.5 h-3.5" />
-                                    </div>
+                                    </button>
                                 </div>
                                 {/* Home Indicator */}
                                 <div className="mx-auto w-32 h-1 bg-gray-300 rounded-full mt-5"></div>
