@@ -174,7 +174,10 @@ export default function ClevioLandingPage() {
       const data = await response.json();
       
       // Process Response
-      const aiResponseText = data.output || data.message || data.text || (typeof data === 'string' ? data : JSON.stringify(data));
+      // Handle Array response from n8n (e.g. [{ output: "..." }])
+      const responseData = Array.isArray(data) ? data[0] : data;
+      const aiResponseText = responseData.output || responseData.message || responseData.text || (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+      
       setPhoneMessages((prev) => [...prev, { role: 'assistant', text: aiResponseText }]);
     } catch (error) {
       console.error("Phone Webhook Error:", error);
@@ -233,7 +236,10 @@ export default function ClevioLandingPage() {
     const data = await sendToWebhook(payload);
     
     // Process Response (Standard Chat)
-    const aiResponseText = data.output || data.message || data.text || (typeof data === 'string' ? data : JSON.stringify(data));
+    // Handle Array response from n8n (e.g. [{ output: "..." }])
+    const responseData = Array.isArray(data) ? data[0] : data;
+    const aiResponseText = responseData.output || responseData.message || responseData.text || (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+
     setMessages((prev) => [...prev, { role: "assistant", text: aiResponseText }]);
     setIsTyping(false);
     setIsSending(false);
