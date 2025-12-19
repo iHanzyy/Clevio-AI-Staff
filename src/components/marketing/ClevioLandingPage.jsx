@@ -972,7 +972,7 @@ function PricingSection() {
         {
           name: "Pro",
           desc: "Untuk bisnis yang sedang berkembang",
-          price: "Rp. 1.299.000",
+          price: "Rp. 750.000",
           period: "/Bulan",
           features: [
             "5 Staff AI",
