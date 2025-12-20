@@ -702,62 +702,61 @@ export default function MobileLanding() {
       
         {/* CSS Phone Result Section */}
         {status === "finished" && (
-            <div ref={resultRef} className="relative w-full bg-white pb-20 pt-10 px-4 animate-in fade-in slide-in-from-bottom-20 duration-1000">
+            <div ref={resultRef} className="relative w-full bg-white py-8 px-4 animate-in fade-in slide-in-from-bottom-20 duration-1000">
                 
-                {/* Professional Phone Component */}
-                <div className="mx-auto w-full max-w-[340px] relative">
-                    {/* Realistic Frame */}
-                    <div className="relative bg-black rounded-[55px] p-3 shadow-2xl border-4 border-[#323232] ring-4 ring-gray-200/50">
+                <h2 className="text-2xl font-bold text-center text-[#2D2216] mb-6">Agent Anda Siap! 🎉</h2>
+                
+                {/* Phone Component - Proper Proportions */}
+                <div className="mx-auto w-full max-w-[300px]">
+                    {/* Phone Frame */}
+                    <div className="relative bg-black rounded-[40px] p-2.5 shadow-2xl">
                         {/* Side Buttons */}
-                        <div className="absolute top-32 -left-2 w-1 h-8 bg-gray-800 rounded-l-md opacity-90"></div> {/* Vol Up */}
-                        <div className="absolute top-44 -left-2 w-1 h-8 bg-gray-800 rounded-l-md opacity-90"></div> {/* Vol Down */}
-                        <div className="absolute top-36 -right-2 w-1 h-12 bg-gray-800 rounded-r-md opacity-90"></div> {/* Power */}
+                        <div className="absolute top-20 -left-1.5 w-1 h-6 bg-gray-700 rounded-l-md"></div>
+                        <div className="absolute top-28 -left-1.5 w-1 h-6 bg-gray-700 rounded-l-md"></div>
+                        <div className="absolute top-24 -right-1.5 w-1 h-10 bg-gray-700 rounded-r-md"></div>
 
-                        {/* Screen Container */}
-                        <div className="relative bg-white rounded-[45px] overflow-hidden h-full border border-gray-800/20">
+                        {/* Screen */}
+                        <div className="relative bg-white rounded-[32px] overflow-hidden flex flex-col" style={{ height: '520px' }}>
                             
-                            {/* Dynamic Island / Notch Area */}
-                            <div className="absolute top-0 left-0 right-0 h-8 z-30 flex justify-center">
-                                <div className="w-[120px] h-[28px] bg-black rounded-b-[18px] flex items-center justify-center">
-                                    {/* Camera dot reflection hint */}
-                                    <div className="w-16 h-2 bg-gray-800/50 rounded-full blur-[1px]"></div>
-                                </div>
+                            {/* Dynamic Island */}
+                            <div className="flex justify-center pt-2 pb-1 bg-white shrink-0">
+                                <div className="w-24 h-6 bg-black rounded-full"></div>
                             </div>
 
                             {/* Status Bar */}
-                            <div className="flex justify-between items-center px-8 pt-3.5 pb-2 text-[10px] font-semibold text-gray-900 bg-white z-20 relative select-none">
+                            <div className="flex justify-between items-center px-6 py-1 text-[10px] font-semibold text-gray-900 bg-white shrink-0">
                                 <HeaderClock />
-                                <div className="flex gap-1.5 opacity-80">
-                                    <Signal className="w-3.5 h-3.5" />
-                                    <Wifi className="w-3.5 h-3.5" />
-                                    <BatteryMedium className="w-3.5 h-3.5" />
+                                <div className="flex gap-1 opacity-80">
+                                    <Signal className="w-3 h-3" />
+                                    <Wifi className="w-3 h-3" />
+                                    <BatteryMedium className="w-3 h-3" />
                                 </div>
                             </div>
 
-                            {/* App Header - Elegant Wood Theme */}
-                            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#E0D4BC] bg-white/95 backdrop-blur-sm sticky top-0 z-10">
+                            {/* App Header */}
+                            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E0D4BC] bg-white shrink-0">
                                 <div className="relative">
-                                    <div className="w-11 h-11 rounded-full bg-[#5D4037] flex items-center justify-center border border-[#4E342E]">
-                                        <span className="text-xl">🤖</span>
+                                    <div className="w-10 h-10 rounded-full bg-[#5D4037] flex items-center justify-center">
+                                        <span className="text-lg">🤖</span>
                                     </div>
-                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#C0A865] border-2 border-white rounded-full"></div>
+                                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-base text-[#2D2216] leading-tight truncate">{agentName}</h3>
-                                    <p className="text-xs text-[#C0A865] font-medium">Online</p>
+                                    <h3 className="font-bold text-sm text-[#2D2216] truncate">{agentName}</h3>
+                                    <p className="text-[11px] text-green-600 font-medium">Online</p>
                                 </div>
                             </div>
 
-                            {/* Chat Content Body - Dynamic Messages */}
-                            <div className="bg-[#FAF6F1] h-[400px] p-5 space-y-4 overflow-y-auto font-sans">
-                                <div className="text-xs text-center text-[#8D7F71] mb-6 font-medium">Hari ini</div>
+                            {/* Chat Body - SCROLLABLE */}
+                            <div className="flex-1 bg-[#FAF6F1] p-4 space-y-3 overflow-y-auto">
+                                <div className="text-[10px] text-center text-[#8D7F71] mb-4">Hari ini</div>
                                 
                                 {phoneMessages.map((msg, idx) => (
                                     <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`p-3.5 px-4 rounded-2xl max-w-[85%] text-[13px] leading-relaxed shadow-[0_2px_8px_rgba(0,0,0,0.04)] ${
+                                        <div className={`py-2.5 px-3.5 rounded-2xl max-w-[80%] text-sm leading-relaxed ${
                                             msg.role === 'user'
-                                            ? 'bg-[#5D4037] text-white rounded-br-none'
-                                            : 'bg-white text-[#2D2216] rounded-tl-none border border-[#E0D4BC]'
+                                            ? 'bg-[#5D4037] text-white rounded-br-sm'
+                                            : 'bg-white text-[#2D2216] rounded-tl-sm border border-[#E0D4BC] shadow-sm'
                                         }`}>
                                             {msg.text}
                                         </div>
@@ -765,29 +764,34 @@ export default function MobileLanding() {
                                 ))}
                             </div>
 
-                            {/* Interactive Input Footer */}
-                            <div className="p-4 bg-white border-t border-[#E0D4BC] absolute bottom-0 left-0 right-0 z-20">
-                                <div className="flex items-center gap-3 bg-[#FAF6F1] rounded-full px-4 py-2 border border-[#E0D4BC]">
+                            {/* Input Footer - Fixed */}
+                            <div className="p-3 bg-white border-t border-[#E0D4BC] shrink-0">
+                                <div className="flex items-center gap-2 bg-[#F5F0EB] rounded-full px-3 py-1.5 border border-[#E0D4BC]">
                                     <input 
                                         type="text"
                                         value={phoneInput}
                                         onChange={(e) => setPhoneInput(e.target.value)}
                                         onKeyDown={(e) => e.key === "Enter" && handlePhoneSend()}
                                         placeholder="Tulis pesan..."
-                                        className="flex-1 bg-transparent text-sm text-[#2D2216] placeholder:text-gray-400 outline-none"
+                                        className="flex-1 bg-transparent text-sm text-[#2D2216] placeholder:text-gray-400 outline-none py-1.5"
                                     />
                                     <button 
                                         onClick={handlePhoneSend}
-                                        className="w-8 h-8 bg-[#5D4037] rounded-full flex items-center justify-center text-white shadow-md hover:bg-[#4E342E] active:scale-95 transition-all"
+                                        className="w-8 h-8 bg-[#5D4037] rounded-full flex items-center justify-center text-white shrink-0 active:scale-95 transition-transform"
                                     >
-                                        <Send className="w-3.5 h-3.5" />
+                                        <Send className="w-4 h-4" />
                                     </button>
                                 </div>
                                 {/* Home Indicator */}
-                                <div className="mx-auto w-32 h-1 bg-gray-300 rounded-full mt-5"></div>
+                                <div className="mx-auto w-28 h-1 bg-gray-300 rounded-full mt-3"></div>
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                {/* CTA Below Phone */}
+                <div className="mt-8 text-center">
+                    <p className="text-gray-600 text-sm mb-4">Coba chat dengan agent Anda sekarang!</p>
                 </div>
             </div>
         )}
