@@ -269,6 +269,17 @@ export default function MobileLanding() {
     }
   }, [status, agentName]);
 
+  // Auto-scroll Phone Chat when new messages arrive
+  const phoneChatRef = useRef(null);
+  useEffect(() => {
+    if (phoneChatRef.current) {
+      phoneChatRef.current.scrollTo({
+        top: phoneChatRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [phoneMessages]);
+
   // POLLING LOGIC: Check for Interview Finish from Server
   useEffect(() => {
     if (status !== 'interviewing' || !chatSessionId) return;
@@ -748,7 +759,7 @@ export default function MobileLanding() {
                             </div>
 
                             {/* Chat Body - SCROLLABLE */}
-                            <div className="flex-1 bg-[#FAF6F1] p-4 space-y-3 overflow-y-auto">
+                            <div ref={phoneChatRef} className="flex-1 bg-[#FAF6F1] p-4 space-y-3 overflow-y-auto">
                                 <div className="text-[10px] text-center text-[#8D7F71] mb-4">Hari ini</div>
                                 
                                 {phoneMessages.map((msg, idx) => (
