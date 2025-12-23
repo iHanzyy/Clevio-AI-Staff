@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ChevronRight, ChevronLeft } from "lucide-react";
 
 const DEFAULT_SPACING = 18;
 
@@ -82,8 +84,8 @@ function clampPopover(style, rect, placement) {
       next.left = 16;
       next.transform = undefined;
     }
-    if (next.left > width - 320) {
-      next.left = width - 320;
+    if (next.left > width - 360) { // Adjusted width for wider card
+      next.left = width - 360;
       if (placement?.includes("center")) {
         next.transform = undefined;
       }
@@ -97,8 +99,8 @@ function clampPopover(style, rect, placement) {
         next.transform = undefined;
       }
     }
-    if (next.top > height - 220) {
-      next.top = height - 220;
+    if (next.top > height - 300) {
+      next.top = height - 300;
       if (!placement?.startsWith("top")) {
         next.transform = undefined;
       }
@@ -140,19 +142,23 @@ export default function AgentFormTour({
 
     if (currentElement && currentElement !== element) {
       currentElement.classList.remove("tour-highlight");
-      // Reset any inline styles
       currentElement.style.removeProperty("z-index");
       currentElement.style.removeProperty("position");
+      currentElement.style.removeProperty("box-shadow");
+      currentElement.style.removeProperty("background-color");
     }
 
     if (element) {
       element.classList.add("tour-highlight");
 
-      // Force element to be positioned and above overlay
       if (!element.style.position || element.style.position === "static") {
         element.style.position = "relative";
       }
-      element.style.zIndex = "1150";
+      element.style.zIndex = "100"; // Lower than popover's 110 (z-50 + child)
+      // Add subtle highlight to target
+      element.style.boxShadow = "0 0 0 4px rgba(230, 138, 68, 0.2)"; // Brand highlight
+      element.style.backgroundColor = "white"; // Ensure visibility
+      element.style.borderRadius = "0.75rem"; // Match rounded-xl
 
       setCurrentRect(element.getBoundingClientRect());
       setCurrentElement(element);
@@ -184,6 +190,9 @@ export default function AgentFormTour({
           element.classList.remove("tour-highlight");
           element.style.removeProperty("z-index");
           element.style.removeProperty("position");
+          element.style.removeProperty("box-shadow");
+          element.style.removeProperty("background-color");
+          element.style.removeProperty("border-radius");
         }
       };
     } else {
@@ -205,7 +214,6 @@ export default function AgentFormTour({
     if (next < steps.length) {
       goTo(next);
     } else {
-      // PERBAIKAN: Tour selesai, panggil onClose
       onClose?.();
     }
   }, [activeIndex, steps, goTo, onClose]);
@@ -236,18 +244,6 @@ export default function AgentFormTour({
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, handleNext, handleBack, onClose]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      document.body.style.removeProperty("overflow");
-      return;
-    }
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [isOpen]);
-
   const activeStep = steps?.[activeIndex];
   const popoverStyle = useMemo(() => {
     if (!activeStep) return {};
@@ -264,52 +260,87 @@ export default function AgentFormTour({
   }
 
   return createPortal(
-    <div className="tour-overlay-wrapper">
-      <div className="tour-dim" onClick={() => onClose?.()} />
-      <div
-        className="tour-popover"
-        style={popoverStyle}
-        data-placement={activeStep.placement}
-      >
-        <div className="tour-popover-body">
-          <span className="tour-step-indicator">
-            Step {activeIndex + 1} of {steps.length}
-          </span>
-          <h3 className="tour-title">{activeStep.title}</h3>
-          <p className="tour-description">{activeStep.description}</p>
-          {activeStep.hint && <p className="tour-hint">{activeStep.hint}</p>}
-          <div className="tour-actions">
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[100] overflow-hidden">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          onClick={() => onClose?.()}
+        />
+
+        {/* Popover */}
+        <motion.div
+          key={activeIndex}
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="absolute z-[110] w-[340px] rounded-2xl border border-[#E0D4BC] bg-white/95 p-6 shadow-2xl backdrop-blur-xl"
+          style={popoverStyle}
+        >
+          <div className="flex items-start justify-between mb-4">
+            <span className="inline-flex items-center rounded-full bg-[#E68A44]/10 px-2.5 py-0.5 text-xs font-bold text-[#E68A44]">
+              Step {activeIndex + 1} of {steps.length}
+            </span>
+            <button
+              onClick={() => onClose?.()}
+              className="rounded-full p-1 text-[#5D4037] hover:bg-[#FAF6F1] transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <h3 className="mb-2 text-lg font-bold text-[#2D2216]">
+            {activeStep.title}
+          </h3>
+          <p className="mb-4 text-sm text-[#5D4037] leading-relaxed">
+            {activeStep.description}
+          </p>
+          {activeStep.hint && (
+            <div className="mb-6 rounded-lg bg-[#FAF6F1] p-3 text-xs text-[#8D7F71] italic border border-[#E0D4BC]/50">
+              Tip: {activeStep.hint}
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
             <button
               type="button"
-              className="tour-secondary"
+              className="text-sm font-medium text-[#8D7F71] hover:text-[#5D4037] transition-colors"
               onClick={() => onClose?.()}
             >
-              Skip tour
+              Skip
             </button>
-            <div className="tour-primary-actions">
-              {activeIndex > 0 && (
-                <button
-                  type="button"
-                  className="tour-secondary"
-                  onClick={handleBack}
-                >
-                  Back
-                </button>
-              )}
+            <div className="flex gap-2">
               <button
                 type="button"
-                className="tour-primary"
+                onClick={handleBack}
+                disabled={activeIndex === 0}
+                className={`flex items-center justify-center rounded-xl p-2.5 transition-colors ${
+                  activeIndex === 0
+                    ? "cursor-not-allowed text-[#E0D4BC]"
+                    : "text-[#5D4037] hover:bg-[#FAF6F1] hover:text-[#2D2216]"
+                }`}
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#2D2216]/20 transition-all hover:translate-y-[-1px] hover:shadow-xl active:translate-y-[1px]"
                 onClick={handleNext}
               >
                 {activeIndex + 1 === steps.length
                   ? activeStep.finishLabel || "Finish"
                   : activeStep.nextLabel || "Next"}
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </div>,
+    </AnimatePresence>,
     document.body
   );
 }

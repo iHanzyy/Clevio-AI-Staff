@@ -377,7 +377,7 @@ export default function NewAgentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#FAF6F1]">
       <div className="container-spacing section-spacing">
         <div className="mx-auto max-w-4xl">
           {/* Modern Header */}
@@ -390,7 +390,7 @@ export default function NewAgentPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => router.push("/dashboard/agents")}
-              className="mb-6 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+              className="mb-6 flex items-center gap-2 text-sm text-[#5D4037] hover:text-[#2D2216] transition-colors group font-medium"
             >
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
               Back to Agents
@@ -401,7 +401,7 @@ export default function NewAgentPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="text-3xl sm:text-4xl font-bold text-foreground mb-4"
+                className="text-3xl sm:text-4xl font-bold text-[#2D2216] mb-4"
               >
                 Create a New Agent
               </motion.h1>
@@ -409,7 +409,7 @@ export default function NewAgentPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-muted-foreground text-lg max-w-2xl mx-auto"
+                className="text-[#5D4037] text-lg max-w-2xl mx-auto"
               >
                 {prefilledData
                   ? "Review and adjust the agent configuration from your interview."
@@ -427,75 +427,69 @@ export default function NewAgentPage() {
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 className="mb-8"
               >
-                <Card className="border-accent/30 bg-accent/5">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-3">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                          className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex-shrink-0"
-                        >
-                          <Sparkles className="h-5 w-5 text-accent" />
-                        </motion.div>
-                        <div>
-                          <p className="font-semibold text-accent">{guidedTourHeading}</p>
-                          <p className="text-muted text-sm">{guidedTourDescription}</p>
-                        </div>
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="button"
-                        onClick={handleGuidedTourStart}
-                        className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-accent to-accent-hover px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:shadow-lg flex-shrink-0"
+                <div className="rounded-2xl border border-[#E0D4BC] bg-white/90 backdrop-blur-xl shadow-lg p-4 sm:p-6">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E68A44]/10 flex-shrink-0"
                       >
-                        {guidedTourButtonLabel}
-                      </motion.button>
+                        <Sparkles className="h-5 w-5 text-[#E68A44]" />
+                      </motion.div>
+                      <div>
+                        <p className="font-bold text-[#2D2216]">{guidedTourHeading}</p>
+                        <p className="text-[#5D4037] text-sm">{guidedTourDescription}</p>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={handleGuidedTourStart}
+                      className="inline-flex items-center justify-center rounded-xl bg-[#2D2216] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#2D2216]/20 transition-all hover:translate-y-[-1px] hover:shadow-xl flex-shrink-0"
+                    >
+                      {guidedTourButtonLabel}
+                    </motion.button>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Agent Form with Enhanced Container */}
+          {/* Agent Form - Removed Redundant Outer Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border-surface-strong/60 shadow-xl">
-              <CardContent className="p-6 sm:p-8">
-                <div className="text-center mb-8">
-                  <motion.div
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 mb-4"
-                  >
-                    <Bot className="h-8 w-8 text-purple-600" />
-                  </motion.div>
-                  <h2 className="text-xl font-bold text-foreground mb-2">Agent Configuration</h2>
-                  <p className="text-muted-foreground">
-                    {prefilledData
-                      ? "Review and customize your imported settings"
-                      : "Build your AI agent with powerful tools and capabilities"
-                    }
-                  </p>
-                </div>
+            <div className="text-center mb-8">
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E68A44]/10 mb-4 shadow-sm"
+              >
+                <Bot className="h-8 w-8 text-[#E68A44]" />
+              </motion.div>
+              <h2 className="text-xl font-bold text-[#2D2216] mb-2">Agent Configuration</h2>
+              <p className="text-[#5D4037]">
+                {prefilledData
+                  ? "Review and customize your imported settings"
+                  : "Build your AI agent with powerful tools and capabilities"
+                }
+              </p>
+            </div>
 
-                <AgentForm
-                  mode="create"
-                  initialValues={prefilledData}
-                  onSubmit={handleCreate}
-                  isSubmitting={isSubmitting}
-                  isTrialPlan={isTrialUser}
-                  isProMonthlyPlan={isProMonthlyUser}
-                  startGuidedTour={showGuidedTour}
-                  onGuidedTourClose={handleGuidedTourClose}
-                />
-              </CardContent>
-            </Card>
+            <AgentForm
+              mode="create"
+              initialValues={prefilledData}
+              onSubmit={handleCreate}
+              isSubmitting={isSubmitting}
+              isTrialPlan={isTrialUser}
+              isProMonthlyPlan={isProMonthlyUser}
+              startGuidedTour={showGuidedTour}
+              onGuidedTourClose={handleGuidedTourClose}
+            />
           </motion.div>
 
           {/* Help Section */}
@@ -505,21 +499,19 @@ export default function NewAgentPage() {
             transition={{ delay: 0.4 }}
             className="mt-8"
           >
-            <Card className="border-surface-strong/20 bg-gradient-to-r from-surface to-surface-strong/30">
-              <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex-shrink-0">
-                        <Info className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">Need Help?</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Semua agen harus melewati wawancara template. Kembali ke galeri jika ingin memulai ulang konfigurasi.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            <div className="rounded-2xl border border-[#E0D4BC] bg-white/50 backdrop-blur-sm p-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4285F4]/10 flex-shrink-0">
+                  <Info className="h-5 w-5 text-[#4285F4]" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#2D2216]">Need Help?</h3>
+                  <p className="text-sm text-[#5D4037]">
+                    Semua agen harus melewati wawancara template. Kembali ke galeri jika ingin memulai ulang konfigurasi.
+                  </p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

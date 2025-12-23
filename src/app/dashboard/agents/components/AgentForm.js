@@ -252,12 +252,12 @@ const GmailToolsPopup = ({ isOpen, onClose, values, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-surface-strong/60 bg-surface p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-              <Mail className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#EA4335]/10 flex items-center justify-center">
+              <Mail className="h-5 w-5 text-[#EA4335]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">Gmail Tools</h3>
@@ -362,12 +362,12 @@ const CalendarToolsPopup = ({ isOpen, onClose, values, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-surface-strong/60 bg-surface p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#4285F4]/10 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-[#4285F4]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">Calendar Tools</h3>
@@ -478,12 +478,12 @@ const SheetsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-surface-strong/60 bg-surface p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-              <FileSpreadsheet className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#34A853]/10 flex items-center justify-center">
+              <FileSpreadsheet className="h-5 w-5 text-[#34A853]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">Sheets Tools</h3>
@@ -606,12 +606,12 @@ const DocsToolsPopup = ({ isOpen, onClose, values, onSave }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-surface-strong/60 bg-surface p-6 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500 flex items-center justify-center">
-              <FileText className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-[#4285F4]/10 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-[#4285F4]" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-foreground">Docs Tools</h3>
@@ -1066,7 +1066,7 @@ export default function AgentForm({
     <div className="w-full max-w-4xl mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-surface rounded-xl shadow-sm border border-surface-strong/60 p-6 md:p-8"
+        className="space-y-8 bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-[#E0D4BC] p-6 md:p-8"
       >
         <AgentFormTour
           steps={tourSteps}
@@ -1101,7 +1101,7 @@ export default function AgentForm({
                 setValues((prev) => ({ ...prev, name: event.target.value }))
               }
               placeholder="e.g. Inbox Concierge"
-              className="w-full rounded-lg border border-surface-strong/60 bg-surface px-4 py-3 text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors"
+              className="w-full rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-[#2D2216] placeholder:text-[#8D7F71] focus:outline-none focus:ring-2 focus:ring-[#E68A44]/20 focus:border-[#E68A44] transition-all shadow-sm"
             />
             {formErrors.name && (
               <p className="text-sm text-red-600">{formErrors.name}</p>
@@ -1122,104 +1122,104 @@ export default function AgentForm({
               <div
                 onClick={() => setShowGmailPopup(true)}
                 className={`
-                  relative group rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5
+                  relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasGmailTools
-                    ? 'border-accent bg-gradient-to-br from-accent/10 to-accent/5 shadow-md'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong hover:bg-surface-hover'
+                    ? 'border-[#EA4335]/50 bg-[#EA4335]/5 shadow-lg shadow-[#EA4335]/10'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#EA4335]/50 hover:bg-[#EA4335]/5'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                    <Mail className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#EA4335]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <Mail className="h-7 w-7 text-[#EA4335]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">Gmail</h3>
-                    <p className="text-xs text-muted">Email automation</p>
+                    <h3 className="font-bold text-[#2D2216] text-sm">Gmail</h3>
+                    <p className="text-xs text-[#8D7F71]">Email automation</p>
                   </div>
                 </div>
                 {hasGmailTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full shadow-sm"></div>
+                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#EA4335] rounded-full shadow-sm ring-2 ring-white"></div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Calendar Card */}
               <div
                 onClick={() => setShowCalendarPopup(true)}
                 className={`
-                  relative group rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5
+                  relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasCalendarTools
-                    ? 'border-accent bg-gradient-to-br from-accent/10 to-accent/5 shadow-md'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong hover:bg-surface-hover'
+                    ? 'border-[#4285F4]/50 bg-[#4285F4]/5 shadow-lg shadow-[#4285F4]/10'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                    <Calendar className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#4285F4]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <Calendar className="h-7 w-7 text-[#4285F4]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">Calendar</h3>
-                    <p className="text-xs text-muted">Event management</p>
+                    <h3 className="font-bold text-[#2D2216] text-sm">Calendar</h3>
+                    <p className="text-xs text-[#8D7F71]">Event management</p>
                   </div>
                 </div>
                 {hasCalendarTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full shadow-sm"></div>
+                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#4285F4] rounded-full shadow-sm ring-2 ring-white"></div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Sheets Card */}
               <div
                 onClick={() => setShowSheetsPopup(true)}
                 className={`
-                  relative group rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5
+                  relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasSheetsTools
-                    ? 'border-accent bg-gradient-to-br from-accent/10 to-accent/5 shadow-md'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong hover:bg-surface-hover'
+                    ? 'border-[#34A853]/50 bg-[#34A853]/5 shadow-lg shadow-[#34A853]/10'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#34A853]/50 hover:bg-[#34A853]/5'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-xl bg-green-500 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                    <FileSpreadsheet className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#34A853]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <FileSpreadsheet className="h-7 w-7 text-[#34A853]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">Sheets</h3>
-                    <p className="text-xs text-muted">Spreadsheets</p>
+                    <h3 className="font-bold text-[#2D2216] text-sm">Sheets</h3>
+                    <p className="text-xs text-[#8D7F71]">Spreadsheets</p>
                   </div>
                 </div>
                 {hasSheetsTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full shadow-sm"></div>
+                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#34A853] rounded-full shadow-sm ring-2 ring-white"></div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
               {/* Docs Card */}
               <div
                 onClick={() => setShowDocsPopup(true)}
                 className={`
-                  relative group rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5
+                  relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                   ${hasDocsTools
-                    ? 'border-accent bg-gradient-to-br from-accent/10 to-accent/5 shadow-md'
-                    : 'border-surface-strong/60 bg-surface hover:border-surface-strong hover:bg-surface-hover'
+                    ? 'border-[#4285F4]/50 bg-[#4285F4]/5 shadow-lg shadow-[#4285F4]/10'
+                    : 'border-[#E0D4BC] bg-white hover:border-[#4285F4]/50 hover:bg-[#4285F4]/5'
                   }
                 `}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className="w-14 h-14 rounded-xl bg-purple-500 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-                    <FileText className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#4285F4]/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    <FileText className="h-7 w-7 text-[#4285F4]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">Docs</h3>
-                    <p className="text-xs text-muted">Documents</p>
+                    <h3 className="font-bold text-[#2D2216] text-sm">Docs</h3>
+                    <p className="text-xs text-[#8D7F71]">Documents</p>
                   </div>
                 </div>
                 {hasDocsTools && (
-                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full shadow-sm"></div>
+                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#4285F4] rounded-full shadow-sm ring-2 ring-white"></div>
                 )}
-                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
             </div>
 
@@ -1297,41 +1297,41 @@ export default function AgentForm({
                     key={tool.id}
                     onClick={() => !isLocked && toggleMcpTool(tool.id)}
                     className={`
-                      relative group rounded-xl border-2 p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5
+                      relative group rounded-2xl border p-5 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1
                       ${isEnabled
-                        ? 'border-accent bg-gradient-to-br from-accent/10 to-accent/5 shadow-md'
+                        ? 'border-[#E68A44]/50 bg-[#E68A44]/5 shadow-lg shadow-[#E68A44]/10'
                         : isLocked
-                        ? 'border-surface-strong/60 bg-surface/60 cursor-not-allowed opacity-70'
-                        : 'border-surface-strong/60 bg-surface hover:border-surface-strong hover:bg-surface-hover'
+                        ? 'border-[#E0D4BC] bg-[#FAF6F1] cursor-not-allowed opacity-70'
+                        : 'border-[#E0D4BC] bg-white hover:border-[#E68A44]/50 hover:bg-[#E68A44]/5'
                       }
                     `}
                   >
                     <div className="flex flex-col items-center text-center space-y-3">
                       <div className={`
-                        w-14 h-14 rounded-xl bg-gradient-to-br ${getGradientColor(tool.id)} flex items-center justify-center shadow-sm
-                        ${!isLocked && 'group-hover:shadow-md transition-shadow'}
+                        w-14 h-14 rounded-2xl bg-[#E68A44]/10 flex items-center justify-center shadow-sm
+                        ${!isLocked && 'group-hover:scale-110 transition-transform duration-300'}
                       `}>
-                        <span className="text-2xl">{getIcon(tool.id)}</span>
+                        <span className="text-2xl opacity-90 grayscale-0">{getIcon(tool.id)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-foreground text-sm">{tool.label}</h3>
-                        <p className="text-xs text-muted line-clamp-2">{tool.description}</p>
+                        <h3 className="font-bold text-[#2D2216] text-sm">{tool.label}</h3>
+                        <p className="text-xs text-[#8D7F71] line-clamp-2">{tool.description}</p>
                       </div>
                     </div>
                     {isEnabled && (
-                      <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-accent rounded-full shadow-sm"></div>
+                      <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-[#E68A44] rounded-full shadow-sm ring-2 ring-white"></div>
                     )}
                     {isLocked && (
                       <div className="absolute top-3 right-3">
-                        <Lock className="h-4 w-4 text-muted" />
+                        <Lock className="h-4 w-4 text-[#8D7F71]" />
                       </div>
                     )}
                     {!isLocked && (
-                      <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-[#8D7F71] opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                     {isLocked && (
                       <div className="mt-2 text-center">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-muted">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#8D7F71] bg-[#2D2216]/5 px-2 py-0.5 rounded-full">
                           <Lock className="h-3 w-3" />
                           Upgrade
                         </span>
@@ -1364,7 +1364,7 @@ export default function AgentForm({
               }
               rows={6}
               placeholder="Describe your agent's behavior, tone, and constraints..."
-              className="w-full rounded-lg border border-surface-strong/60 bg-surface px-4 py-3 text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-colors resize-y"
+              className="w-full rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-[#2D2216] placeholder:text-[#8D7F71] focus:outline-none focus:ring-2 focus:ring-[#E68A44]/20 focus:border-[#E68A44] transition-all shadow-sm resize-y"
             />
             {formErrors.systemPrompt && (
               <p className="text-sm text-red-600">{formErrors.systemPrompt}</p>
@@ -1396,7 +1396,7 @@ export default function AgentForm({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center px-6 py-2.5 rounded-lg bg-gradient-primary hover:opacity-90 text-white text-sm font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-6 py-2.5 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:translate-y-[-1px] text-white text-sm font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSubmitting ? (
                   <>
