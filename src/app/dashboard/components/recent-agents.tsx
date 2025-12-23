@@ -129,12 +129,7 @@ const AgentCard = ({
 
         {/* Stats */}
         <div className="flex flex-wrap items-center gap-4 text-xs text-[#8D7F71] pt-3 border-t border-[#E0D4BC]/30">
-          {agent.conversations !== undefined && (
-            <div className="flex items-center gap-1.5">
-              <MessageSquare className="h-3.5 w-3.5" />
-              <span className="font-medium">{agent.conversations.toLocaleString()} chats</span>
-            </div>
-          )}
+
           {agent.lastActive && (
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
@@ -197,7 +192,7 @@ export function RecentAgents({
         {hasAgents && (
           <button
             onClick={onCreateAgent}
-            className="px-4 py-2 bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover:from-[#1A1410] hover:to-[#0D0A08] text-white font-bold text-sm rounded-xl shadow-[0_4px_16px_rgba(45,34,22,0.24)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32)] active:scale-[0.98] transition-all flex items-center gap-1.5 border-0"
+            className="px-4 py-2 bg-[#2D2216] hover:bg-[#1A1410] text-white font-bold text-sm rounded-xl shadow-lg hover:shadow-xl active:scale-[0.98] transition-all flex items-center gap-1.5 border-0"
           >
             <Plus className="h-4 w-4" />
             New

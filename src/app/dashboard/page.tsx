@@ -20,7 +20,7 @@ const DashboardSkeleton = () => (
     </div>
 
     {/* Stats Grid Skeleton */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {[1, 2].map((i) => (
         <div key={i} className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-[#E0D4BC] shadow-sm animate-pulse">
           <div className="flex items-start justify-between">
@@ -153,7 +153,7 @@ export default function Dashboard() {
   const hasAgents = agents.length > 0;
 
   return (
-    <div className="py-2">
+    <div className="py-6 max-w-[1600px] mx-auto space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -178,7 +178,7 @@ export default function Dashboard() {
           className="space-y-6"
         >
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <StatsCard
               title="Total Agents"
               value={stats.totalAgents}

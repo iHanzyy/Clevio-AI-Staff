@@ -28,18 +28,17 @@ export function StatsCard({
         scale: 1.01,
         transition: { duration: 0.15, ease: 'easeInOut' }
       }}
-      whileTap={{ scale: 0.99 }}
       className={className}
     >
-      <div className="bg-white/90">
+      <div className="bg-white/80 backdrop-blur-xl border border-[#E0D4BC] rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-xs font-bold text-[#8D7F71]">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-[#8D7F71] mb-1">
               {title}
             </p>
 
-            <div className="flex items-baseline gap-2 mb-1">
-              <p className="text-3xl font-extrabold text-[#2D2216]">
+            <div className="flex items-baseline gap-2 mb-2">
+              <p className="text-4xl font-extrabold text-[#2D2216]">
                 <NumberFlow
                   value={value}
                   format={{
@@ -50,8 +49,10 @@ export function StatsCard({
               </p>
 
               {trend && (
-                <span className={`text-xs font-bold flex items-center gap-1 ${
-                  trend.isPositive ? "text-emerald-600" : "text-red-500"
+                <span className={`text-xs font-bold flex items-center gap-1 px-2 py-0.5 rounded-full ${
+                  trend.isPositive 
+                    ? "bg-emerald-50 text-emerald-600" 
+                    : "bg-red-50 text-red-500"
                 }`}>
                   {trend.isPositive ? '↑' : '↓'}
                   {Math.abs(trend.value)}%
@@ -60,14 +61,14 @@ export function StatsCard({
             </div>
 
             {description && (
-              <p className="text-sm text-[#5D4037]">
+              <p className="text-sm text-[#5D4037] truncate">
                 {description}
               </p>
             )}
           </div>
 
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#E68A44]/10 to-[#D87A36]/5 border border-[#E68A44]/20">
-            <Icon className="h-6 w-6 text-[#E68A44]" />
+          <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-[#E68A44]/10 text-[#E68A44] flex-shrink-0 ml-4">
+            <Icon className="h-6 w-6" />
           </div>
         </div>
       </div>
