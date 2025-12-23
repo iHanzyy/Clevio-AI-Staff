@@ -134,11 +134,11 @@ const EmptyState = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
     animate={{ opacity: 1, y: 0 }}
     className="rounded-xl border border-dashed border-border p-6 sm:p-10 text-center bg-card "
   >
-    <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto mb-6">
+    <div className="w-16 h-16 rounded-full bg-gradient-to-b from-[#2D2216] to-[#1A1410] flex items-center justify-center mx-auto mb-8">
       <Bot className="h-8 w-8 text-white" />
     </div>
 
-    <h3 className="text-xl sm:text-2xl font-semibold text-foreground mb-3">
+    <h3 className="text-xl sm:text-2xl font-semibold text-foreground mb-4">
       You haven&apos;t created any agents yet
     </h3>
 
@@ -149,8 +149,7 @@ const EmptyState = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
     <Button
       onClick={onCreateAgent}
       size="lg"
-      variant="default"
-      className="px-8 bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover-lift"
+      className="px-8 !bg-gradient-to-b !from-[#2D2216] !to-[#1A1410] hover:!from-[#1A1410] hover:!to-[#0D0A08] text-white shadow-[0_4px_16px_rgba(45,34,22,0.24)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32)] border-0 hover-lift"
     >
       <Plus className="h-5 w-5 mr-2" />
       Create your first agent
@@ -1014,8 +1013,7 @@ export default function AgentsPage() {
         <Button
           onClick={handleCreateAgent}
           size="lg"
-          variant="default"
-          className="bg-gradient-to-b from-[#2D2216] to-[#1A1410] hover-lift w-full sm:w-auto"
+          className="!bg-gradient-to-b !from-[#2D2216] !to-[#1A1410] hover:!from-[#1A1410] hover:!to-[#0D0A08] text-white shadow-[0_4px_16px_rgba(45,34,22,0.24)] hover:shadow-[0_6px_24px_rgba(45,34,22,0.32)] border-0 hover-lift w-full sm:w-auto"
         >
           <Plus className="h-5 w-5 mr-2" />
           New Agent
