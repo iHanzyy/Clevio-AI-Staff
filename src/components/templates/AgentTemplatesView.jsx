@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Lock, Search, LayoutGrid, Users, Target, HeadphonesIcon, Zap, Bot } from "lucide-react";
+import { Lock, Search, LayoutGrid, Users, Target, HeadphonesIcon, Zap, Bot, GraduationCap, TrendingUp, Briefcase, Microscope } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import templatesData from "@/data/agent-templates.json";
@@ -14,11 +14,11 @@ import { Badge } from "@/components/ui/badge";
 const CATEGORIES = [
   { id: "all", label: "All", icon: LayoutGrid },
   { id: "Customer Services", label: "Customer Services", icon: HeadphonesIcon },
-  { id: "Education", label: "Education", icon: Target },
-  { id: "Finance", label: "Finance", icon: Target },
-  { id: "Project", label: "Project", icon: Target },
-  { id: "HR", label: "HR", icon: Users },
-  { id: "Research", label: "Research", icon: Target },
+  { id: "Education", label: "Education", icon: GraduationCap },
+  { id: "Finance", label: "Finance", icon: TrendingUp },
+  { id: "Project", label: "Project", icon: Briefcase },
+  { id: "HR", label: "Human Resources", icon: Users },
+  { id: "Research", label: "Research", icon: Microscope },
 ];
 
 const TRIAL_TEMPLATE_LIMIT = 2;
