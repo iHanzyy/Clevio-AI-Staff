@@ -63,29 +63,30 @@ export default function TemplateConfirmationDialog({
       />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-lg rounded-2xl border border-surface-strong/60 bg-surface p-6 shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-2xl border border-[#E0D4BC] bg-white/95 backdrop-blur-xl p-6 shadow-2xl">
         {/* Header */}
         <div className="mb-4">
-          <h3 className="text-xl font-semibold text-foreground">
+          <h3 className="text-xl font-bold text-[#2D2216]">
             Start Agent Interview
           </h3>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-[#5D4037]">
             You&apos;re about to start chatting with Agent Interview
           </p>
         </div>
 
         {/* Template Preview */}
-        <div className="mb-6 rounded-xl border border-surface-strong/60 bg-background p-4">
+        {/* Template Preview */}
+        <div className="mb-6 rounded-xl border border-[#E0D4BC] bg-white/50 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#E68A44]/10 text-lg font-bold text-[#E68A44]">
               {template.name.charAt(0)}
             </div>
             <div className="flex-1">
-              <h4 className="font-semibold text-foreground">{template.name}</h4>
-              <span className="mt-1 inline-block rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+              <h4 className="font-bold text-[#2D2216]">{template.name}</h4>
+              <span className="mt-1 inline-block rounded-full bg-[#E68A44]/10 px-2.5 py-0.5 text-xs font-medium text-[#E68A44]">
                 {template.category}
               </span>
-              <p className="mt-2 text-sm text-muted line-clamp-2">
+              <p className="mt-2 text-sm text-[#5D4037] line-clamp-2">
                 {template.description}
               </p>
             </div>
@@ -93,14 +94,14 @@ export default function TemplateConfirmationDialog({
         </div>
 
         {/* Interview Info */}
-        <div className="mb-6 rounded-xl bg-accent/5 border border-accent/20 p-4">
-          <h4 className="mb-2 text-sm font-semibold text-foreground">
+        <div className="mb-6 rounded-xl bg-[#FAF6F1] border border-[#E0D4BC] p-4">
+          <h4 className="mb-2 text-sm font-bold text-[#2D2216]">
             What to expect:
           </h4>
-          <ul className="space-y-1.5 text-sm text-muted">
+          <ul className="space-y-2 text-sm text-[#5D4037]">
             <li className="flex items-start gap-2">
               <svg
-                className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#E68A44]"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -114,7 +115,7 @@ export default function TemplateConfirmationDialog({
             </li>
             <li className="flex items-start gap-2">
               <svg
-                className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#E68A44]"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -128,7 +129,7 @@ export default function TemplateConfirmationDialog({
             </li>
             <li className="flex items-start gap-2">
               <svg
-                className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#E68A44]"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -142,7 +143,7 @@ export default function TemplateConfirmationDialog({
             </li>
             <li className="flex items-start gap-2">
               <svg
-                className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent"
+                className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#E68A44]"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -162,14 +163,14 @@ export default function TemplateConfirmationDialog({
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 rounded-xl border border-surface-strong/60 bg-surface px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-strong/60 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 rounded-xl border border-[#E0D4BC] bg-white px-4 py-3 text-sm font-medium text-[#5D4037] transition-colors hover:bg-[#FAF6F1] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 rounded-xl bg-accent px-4 py-3 text-sm font-medium text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent/90 hover:shadow-accent/40 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 rounded-xl bg-gradient-to-b from-[#2D2216] to-[#1A1410] px-4 py-3 text-sm font-medium text-white shadow-lg shadow-[rgba(45,34,22,0.24)] transition-all hover:shadow-[rgba(45,34,22,0.32)] disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
