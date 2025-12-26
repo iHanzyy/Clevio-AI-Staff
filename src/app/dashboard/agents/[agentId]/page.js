@@ -230,6 +230,7 @@ export default function AgentDetailPage() {
   const [googleAuthChecking, setGoogleAuthChecking] = useState(false);
   const googleAuthPollRef = useRef(null);
   const googleAuthCheckingRef = useRef(false);
+  const initialGoogleAuthCheckDoneRef = useRef(false);
 
   const normalizedUserPlan = useMemo(() => {
     const planCode =
@@ -468,15 +469,41 @@ export default function AgentDetailPage() {
       return { status: "idle", authUrl: null };
     }
     if (googleAuthCheckingRef.current) {
+      console.log("[GoogleAuth] Skipping - already checking");
       return { status: "idle", authUrl: null };
+    }
+
+    // Debounce: prevent duplicate calls within 2 seconds (handles React Strict Mode)
+    const now = Date.now();
+    const lastCheckKey = `googleAuthLastCheck_${agentIdParam}`;
+    const lastCheck = typeof window !== "undefined" ? Number(window.sessionStorage.getItem(lastCheckKey) || 0) : 0;
+    if (now - lastCheck < 2000) {
+      console.log("[GoogleAuth] Skipping - debounced (called within 2 seconds)");
+      return { status: "idle", authUrl: null };
+    }
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(lastCheckKey, String(now));
     }
 
     googleAuthCheckingRef.current = true;
     setGoogleAuthChecking(true);
     setGoogleAuthError("");
 
+
     try {
       const response = await apiService.checkGoogleAuthStatus(agentIdParam);
+      
+      // Debug logging to help diagnose refresh issues
+      console.log("[GoogleAuth] Refresh status response:", {
+        raw: response,
+        status: response?.status,
+        refreshed: response?.refreshed,
+        tokens: response?.tokens?.length || 0,
+        requiredScopes: response?.required_scopes?.length || 0,
+        grantedScopes: response?.granted_scopes?.length || 0,
+        missingScopes: response?.missing_scopes?.length || 0,
+      });
+      
       const statusValue =
         typeof response?.status === "string"
           ? response.status.toLowerCase()
@@ -493,10 +520,40 @@ export default function AgentDetailPage() {
         ? response.missing_scopes
         : [];
       const hasTokens = tokens.length > 0;
+      const hasGrantedScopes = grantedScopes.length > 0;
       const hasMissing = missingScopes.length > 0;
+      
+      // Also check for "connected" or "success" status from backend
+      const isConnectedStatus = ["authenticated", "connected", "success", "active"].includes(statusValue || "");
+      
+      console.log("[GoogleAuth] Evaluated conditions:", {
+        hasTokens,
+        hasGrantedScopes,
+        statusValue,
+        refreshed,
+        hasMissing,
+        isConnectedStatus,
+        willBeConnected: (hasTokens || hasGrantedScopes || isConnectedStatus || refreshed) && !hasMissing,
+      });
 
-      // Mark connected only when all required scopes are satisfied.
-      if ((hasTokens || statusValue === "authenticated" || refreshed) && !hasMissing) {
+      // Check if granted scopes are sufficient - if we have multiple key scopes, consider connected
+      // Backend may report missing_scopes inaccurately, so be more permissive
+      const hasKeyScopes = grantedScopes.some(s => 
+        s.includes("gmail") || s.includes("calendar") || s.includes("drive") || s.includes("docs") || s.includes("sheets")
+      );
+      const hasSufficientScopes = grantedScopes.length >= 3;
+      const effectivelyConnected = hasGrantedScopes && (hasSufficientScopes || hasKeyScopes);
+
+      console.log("[GoogleAuth] Additional checks:", {
+        hasKeyScopes,
+        hasSufficientScopes,
+        effectivelyConnected,
+      });
+
+      // Mark connected when:
+      // 1. Standard case: has tokens or status indicates connected, with no missing scopes
+      // 2. Override case: effectively connected based on granted scopes (backend may be wrong about missing)
+      if ((hasTokens || isConnectedStatus || refreshed) && !hasMissing || effectivelyConnected) {
         setGoogleAuthInfo({
           agentId: agentIdParam,
           status: "connected",
@@ -526,6 +583,7 @@ export default function AgentDetailPage() {
 
         return { status: "connected", authUrl: null };
       }
+
 
       if (response?.auth_url) {
         setGoogleAuthInfo({
@@ -657,85 +715,22 @@ export default function AgentDetailPage() {
   ]);
 
   const openGoogleConnectModal = useCallback(() => {
-    const hasAuthPending = googleAuthInfo?.status === "pending" || !!googleAuthInfo?.authUrl;
     if (isTrialPlan) return;
     // Always allow manual open; we'll show error message inside if truly not needed
     setConfirmSkipGoogleConnect(false);
     setShowGoogleConnectModal(true);
-    if (!googleAuthConnected) {
-      void checkGoogleAuthStatus();
-    }
-  }, [
-    isTrialPlan,
-    googleAuthConnected,
-    googleAuthInfo?.status,
-    googleAuthInfo?.authUrl,
-    checkGoogleAuthStatus,
-  ]);
+    // Don't trigger checkGoogleAuthStatus here - it causes double refresh
+    // Status check is handled by polling effect or manual Refresh button
+  }, [isTrialPlan]);
+
 
   const closeGoogleConnectModal = useCallback(() => {
     setShowGoogleConnectModal(false);
     setConfirmSkipGoogleConnect(false);
   }, []);
 
-  useEffect(() => {
-    if (
-      !agent?.id ||
-      isTrialPlan ||
-      typeof window === "undefined"
-    ) {
-      return;
-    }
-    const pendingAgentId = window.sessionStorage.getItem(
-      GOOGLE_CONNECT_PROMPT_KEY
-    );
-    if (
-      pendingAgentId &&
-      pendingAgentId === agent.id.toString()
-    ) {
-      window.sessionStorage.removeItem(GOOGLE_CONNECT_PROMPT_KEY);
-      openGoogleConnectModal();
-    }
-  }, [agent?.id, isTrialPlan, openGoogleConnectModal]);
-
-  useEffect(() => {
-    if (
-      autoGooglePromptShownRef.current ||
-      !googleAuthInfo?.authUrl ||
-      !requiresGoogleAuth ||
-      isTrialPlan
-    ) {
-      return;
-    }
-    autoGooglePromptShownRef.current = true;
-    openGoogleConnectModal();
-  }, [
-    googleAuthInfo?.authUrl,
-    requiresGoogleAuth,
-    isTrialPlan,
-    openGoogleConnectModal,
-  ]);
-
-  // Fallback: if agent has Google tools but no authUrl yet, still open modal once.
-  useEffect(() => {
-    if (
-      autoGoogleFirstLoadRef.current ||
-      isTrialPlan ||
-      googleAuthConnected ||
-      !requiresGoogleAuth ||
-      !agent?.id
-    ) {
-      return;
-    }
-    autoGoogleFirstLoadRef.current = true;
-    openGoogleConnectModal();
-  }, [
-    agent?.id,
-    requiresGoogleAuth,
-    isTrialPlan,
-    googleAuthConnected,
-    openGoogleConnectModal,
-  ]);
+  // NOTE: Removed redundant useEffects that were causing double API calls
+  // Google auth status is now checked only once in the initial load effect (line ~1316)
 
   useEffect(() => {
     if (googleAuthConnected && showGoogleConnectModal) {
@@ -1277,6 +1272,30 @@ export default function AgentDetailPage() {
     }
   }, [agent?.id, authLoading, user, handleRefreshWhatsAppStatus]);
 
+  // Load Google Auth status when agent is loaded and requires Google auth - ONCE ONLY
+  useEffect(() => {
+    // Skip if already checked for this agent
+    if (initialGoogleAuthCheckDoneRef.current) {
+      return;
+    }
+    
+    if (agent?.id && !authLoading && user && requiresGoogleAuth && !isTrialPlan) {
+      // Mark as done BEFORE calling to prevent race conditions
+      initialGoogleAuthCheckDoneRef.current = true;
+      console.log("[GoogleAuth] Initial load - checking status for agent:", agent.id);
+      void checkGoogleAuthStatus();
+    }
+  }, [agent?.id, authLoading, user, requiresGoogleAuth, isTrialPlan, checkGoogleAuthStatus]);
+
+  // Reset ref when agent changes (navigating to different agent)
+  useEffect(() => {
+    return () => {
+      initialGoogleAuthCheckDoneRef.current = false;
+    };
+  }, [agent?.id]);
+
+
+
   // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
@@ -1760,7 +1779,7 @@ export default function AgentDetailPage() {
                           className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-medium text-slate-700"
                         >
                           {icon === Calendar ? (
-                            <Calendar className="h-3 w-3 text-blue-500" />
+                            <Calendar className="h-3 w-3 text-[#E68A44]" />
                           ) : (
                             <Mail className="h-3 w-3 text-red-500" />
                           )}
@@ -1772,29 +1791,27 @@ export default function AgentDetailPage() {
                 )}
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    onClick={openGoogleConnectModal}
-                    disabled={googleAuthChecking || googleAuthStarting}
-                    style={{ background: '#2D2216' }}
-                    className="text-white shadow-lg rounded-xl font-medium transition-all duration-200 hover:opacity-90"
-                  >
-                    {googleAuthStarting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Opening Google...
-                      </>
-                    ) : googleAuthConnected ? (
-                      <>
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Manage Google Access
-                      </>
-                    ) : (
-                      <>
-                        <Shield className="h-4 w-4 mr-2" />
-                        Connect Google
-                      </>
-                    )}
-                  </Button>
+                  {/* Only show Connect Google button when NOT connected */}
+                  {!googleAuthConnected && (
+                    <Button
+                      onClick={openGoogleConnectModal}
+                      disabled={googleAuthChecking || googleAuthStarting}
+                      style={{ background: '#2D2216' }}
+                      className="text-white shadow-lg rounded-xl font-medium transition-all duration-200 hover:opacity-90"
+                    >
+                      {googleAuthStarting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Opening Google...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="h-4 w-4 mr-2" />
+                          Connect Google
+                        </>
+                      )}
+                    </Button>
+                  )}
 
                   <Button
                     onClick={() => {
@@ -1899,8 +1916,8 @@ export default function AgentDetailPage() {
                 <div className="border-t border-border pt-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded bg-gradient-to-br from-[#EA4335] to-[#4285F4] flex items-center justify-center">
-                        <div className="w-3 h-3 bg-white rounded-sm"></div>
+                      <div className="w-5 h-5 rounded bg-[#E68A44]/20 flex items-center justify-center">
+                        <Shield className="w-3 h-3 text-[#E68A44]" />
                       </div>
                       <CardTitle className="text-lg">Google Integration</CardTitle>
                     </div>
@@ -1954,7 +1971,7 @@ export default function AgentDetailPage() {
                                 {icon === Mail ? (
                                   <Mail className="h-3.5 w-3.5 text-[#EA4335]" />
                                 ) : (
-                                  <Calendar className="h-3.5 w-3.5 text-[#4285F4]" />
+                                  <Calendar className="h-3.5 w-3.5 text-[#E68A44]" />
                                 )}
                                 <span className="text-xs font-semibold text-[#2D2216]">{label}</span>
                               </div>
@@ -1966,7 +1983,8 @@ export default function AgentDetailPage() {
                         {googleAuthInfo.status !== 'connected' && (
                           <Button
                             onClick={() => setShowGoogleConnectModal(true)}
-                            className="w-full sm:w-auto bg-gradient-to-r from-red-500 to-blue-500 hover:from-red-600 hover:to-blue-600 text-white font-medium"
+                            style={{ background: '#2D2216' }}
+                            className="w-full sm:w-auto text-white font-medium shadow-lg hover:opacity-90 transition-all"
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
                             Connect Google Account
@@ -2737,7 +2755,7 @@ export default function AgentDetailPage() {
             </Button>
 
             <div className="space-y-5 text-center">
-              <div className="w-16 h-16 rounded-full bg-blue-600/10 flex items-center justify-center mx-auto text-blue-600">
+              <div className="w-16 h-16 rounded-full bg-[#E68A44]/10 flex items-center justify-center mx-auto text-[#E68A44]">
                 <Power className="h-8 w-8" />
               </div>
               <div className="space-y-2">
@@ -2754,7 +2772,8 @@ export default function AgentDetailPage() {
               <div className="space-y-3">
                 <Button
                   onClick={handleGoogleConnectNow}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  style={{ background: '#2D2216' }}
+                  className="w-full text-white shadow-lg hover:opacity-90 transition-all"
                   disabled={googleAuthChecking || googleAuthStarting}
                 >
                   {googleAuthStarting ? (
@@ -2769,6 +2788,7 @@ export default function AgentDetailPage() {
                     </>
                   )}
                 </Button>
+
                 <Button
                   onClick={handleSkipGoogleConnect}
                   variant="outline"

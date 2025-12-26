@@ -36,6 +36,14 @@ const collectScopesFromMap = (toolIds = []) => {
 const mapAgentToInitialValues = (agent) => {
   if (!agent) return null;
 
+  console.log("[EditAgent] Raw agent data from backend:", {
+    tools: agent.tools,
+    google_tools: agent.google_tools,
+    config_google_tools: agent.config?.google_tools,
+    mcp_tools: agent.mcp_tools,
+    config_mcp_tools: agent.config?.mcp_tools,
+  });
+
   const toolSet = new Set();
   const addArray = (arr) => {
     (arr || []).forEach((t) => {
@@ -61,13 +69,23 @@ const mapAgentToInitialValues = (agent) => {
     : Array.isArray(agent.config?.mcp_tools)
     ? agent.config.mcp_tools
     : [];
-  const googleTools = Array.isArray(agent.google_tools)
+  
+  // Extract google_tools: check backend response first, then extract from tools array
+  let googleTools = Array.isArray(agent.google_tools) && agent.google_tools.length > 0
     ? agent.google_tools
-    : Array.isArray(agent.config?.google_tools)
+    : Array.isArray(agent.config?.google_tools) && agent.config.google_tools.length > 0
     ? agent.config.google_tools
     : [];
+  
+  // If backend didn't return google_tools separately, extract from tools array
+  if (googleTools.length === 0) {
+    const allTools = Array.from(toolSet);
+    googleTools = allTools.filter(
+      (t) => t.startsWith("google_") || t.startsWith("gmail")
+    );
+  }
 
-  return {
+  const result = {
     name: agent.name ?? "",
     tools: Array.from(toolSet),
     google_tools: googleTools,
@@ -80,6 +98,9 @@ const mapAgentToInitialValues = (agent) => {
     memoryType: agent.config?.memory_type ?? "buffer",
     reasoningStrategy: agent.config?.reasoning_strategy ?? "react",
   };
+
+  console.log("[EditAgent] Mapped initial values:", result);
+  return result;
 };
 
 export default function EditAgentPage() {

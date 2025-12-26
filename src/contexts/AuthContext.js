@@ -848,10 +848,40 @@ const startTrialSession = useCallback(
             const pendingData = JSON.parse(pendingPayloadRaw);
             if (pendingData?.agentPayload) {
               console.log("[Auth] Found pending trial agent, creating...");
+              
+              // Extract google_tools before creation
+              const googleTools = Array.isArray(pendingData.agentPayload.google_tools)
+                ? pendingData.agentPayload.google_tools
+                : [];
+              
               try {
-                await apiService.createAgent(pendingData.agentPayload);
-                console.log("[Auth] Successfully created pending trial agent");
+                const createdAgent = await apiService.createAgent(pendingData.agentPayload);
+                console.log("[Auth] Successfully created pending trial agent:", createdAgent?.id);
                 window.localStorage.removeItem("trialPendingAgentPayload");
+                
+                // If agent has google_tools, store redirect info for OAuth
+                if (createdAgent?.id && googleTools.length > 0) {
+                  const actualGoogleTools = googleTools.filter(
+                    (t) => typeof t === "string" && (t.startsWith("google_") || t.startsWith("gmail"))
+                  );
+                  
+                  if (actualGoogleTools.length > 0) {
+                    // Store pending OAuth info - the dashboard or agent page will pick this up
+                    try {
+                      window.sessionStorage.setItem(
+                        "pendingTrialAgentOAuth",
+                        JSON.stringify({
+                          agentId: createdAgent.id,
+                          googleTools: actualGoogleTools,
+                          createdAt: new Date().toISOString(),
+                        })
+                      );
+                      console.log("[Auth] Stored pending OAuth info for trial agent");
+                    } catch (storeError) {
+                      console.warn("[Auth] Failed to store pending OAuth info", storeError);
+                    }
+                  }
+                }
               } catch (createError) {
                 console.warn("[Auth] Failed to create pending trial agent", createError);
                 // Keep the payload for next login attempt
@@ -865,6 +895,7 @@ const startTrialSession = useCallback(
           } catch (_) {}
         }
       }
+
 
       return {
         success: true,

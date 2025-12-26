@@ -336,6 +336,7 @@ export default function NewAgentPage() {
         }
       }
 
+
       if (isTrialUser) {
         try {
           sessionStorage.setItem(
@@ -349,18 +350,14 @@ export default function NewAgentPage() {
         } catch (error) {
           console.warn("Failed to persist trial agent context", error);
         }
-        router.push(
-          params.toString()
-            ? `/trial/chat?agentId=${agent.id}&${params.toString()}`
-            : `/trial/chat?agentId=${agent.id}`
-        );
-      } else {
-        router.push(
-          params.toString()
-            ? `/dashboard/agents/${agent.id}?${params.toString()}`
-            : `/dashboard/agents/${agent.id}`
-        );
       }
+
+      // All users (including trial) now go to dashboard agent detail page
+      router.push(
+        params.toString()
+          ? `/dashboard/agents/${agent.id}?${params.toString()}`
+          : `/dashboard/agents/${agent.id}`
+      );
     } finally {
       setIsSubmitting(false);
     }

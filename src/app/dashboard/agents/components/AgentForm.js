@@ -574,7 +574,7 @@ function mapInitialValues(input) {
   });
 
 
-  return {
+  const result = {
     name: input.name ?? DEFAULT_VALUES.name,
     tools: toolState,
     mcpTools: mcpState,
@@ -609,6 +609,12 @@ function mapInitialValues(input) {
       input.config?.reasoning_strategy ??
       DEFAULT_VALUES.reasoningStrategy,
   };
+
+  console.log("[AgentForm] mapInitialValues input:", input);
+  console.log("[AgentForm] mapInitialValues output toolState:", toolState);
+  console.log("[AgentForm] mapInitialValues output mcpState:", mcpState);
+
+  return result;
 }
 
 export default function AgentForm({
@@ -814,7 +820,7 @@ export default function AgentForm({
           values.reasoningStrategy || DEFAULT_VALUES.reasoningStrategy,
         system_prompt: values.systemPrompt.trim(),
       },
-      tools: combinedTools,
+      // Backend expects only google_tools and mcp_tools, not a generic "tools" array
       google_tools: Array.from(new Set(googleTools)),
     };
 

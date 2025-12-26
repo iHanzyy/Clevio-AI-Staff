@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Bot, RefreshCw, Plus, Users, Loader2 } from "lucide-react";
 
@@ -9,6 +10,8 @@ import { useMobileDetection } from "./hooks/useMobileDetection";
 import { useDashboardActions } from "./hooks/useDashboardActions";
 import { StatsCard } from "./components/stats-card";
 import { RecentAgents } from "./components/recent-agents";
+import { triggerGoogleOAuth } from "@/lib/triggerGoogleOAuth";
+
 
 // Loading state component
 const DashboardSkeleton = () => (
@@ -90,6 +93,7 @@ const DashboardEmpty = ({ onCreateAgent }: { onCreateAgent: () => void }) => (
 
 
 export default function Dashboard() {
+  const router = useRouter();
   const {
     agents,
     stats,
@@ -102,6 +106,53 @@ export default function Dashboard() {
 
   const isMobile = useMobileDetection();
   const { handleCreateAgent, handleAgentClick } = useDashboardActions();
+
+  // Check for pending trial agent OAuth and redirect
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const checkPendingOAuth = async () => {
+      try {
+        const pendingOAuthRaw = window.sessionStorage.getItem("pendingTrialAgentOAuth");
+        if (!pendingOAuthRaw) return;
+        
+        const pendingOAuth = JSON.parse(pendingOAuthRaw);
+        if (!pendingOAuth?.agentId || !pendingOAuth?.googleTools?.length) {
+          window.sessionStorage.removeItem("pendingTrialAgentOAuth");
+          return;
+        }
+        
+        // Clear immediately to prevent re-trigger
+        window.sessionStorage.removeItem("pendingTrialAgentOAuth");
+        
+        console.log("[Dashboard] Found pending trial OAuth, triggering...", pendingOAuth);
+        
+        const { authUrl, authState } = await triggerGoogleOAuth({
+          agentId: pendingOAuth.agentId,
+          googleTools: pendingOAuth.googleTools,
+        });
+        
+        if (authUrl) {
+          const params = new URLSearchParams();
+          params.set("authUrl", authUrl);
+          if (authState) {
+            params.set("authState", authState);
+          }
+          router.replace(`/dashboard/agents/${pendingOAuth.agentId}?${params.toString()}`);
+        } else {
+          // Even without authUrl, redirect to the new agent
+          router.replace(`/dashboard/agents/${pendingOAuth.agentId}`);
+        }
+      } catch (error) {
+        console.warn("[Dashboard] Failed to process pending OAuth", error);
+        try {
+          window.sessionStorage.removeItem("pendingTrialAgentOAuth");
+        } catch (_) {}
+      }
+    };
+    
+    checkPendingOAuth();
+  }, [router]);
 
   // Authentication and subscription checks
   useEffect(() => {
@@ -119,6 +170,7 @@ export default function Dashboard() {
 
     loadDashboardData();
   }, [authLoading, user, loadDashboardData]);
+
 
   if (authLoading || loading) {
     return (

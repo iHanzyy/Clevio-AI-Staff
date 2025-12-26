@@ -22,6 +22,7 @@ import {
   clearTrialAgentPayload,
 } from "@/lib/trialStorage";
 import { markTrialEmailUsed } from "@/lib/trialGuard";
+import { triggerGoogleOAuth, hasGoogleToolsRequiringOAuth } from "@/lib/triggerGoogleOAuth";
 import toast, { Toaster } from 'react-hot-toast';
 
 const toastStyle = {
@@ -182,7 +183,7 @@ function PaymentContent() {
   const completeTrialProvisioning = useCallback(
     async (activeEmail) => {
       if (!trialAgentDraft?.agentPayload || !activeEmail) {
-        return;
+        return { agent: null, googleTools: [] };
       }
 
       const agentPayload = {
@@ -191,6 +192,13 @@ function PaymentContent() {
       if (!agentPayload.plan_code) {
         agentPayload.plan_code = "TRIAL";
       }
+
+      // Extract google_tools before any operations
+      const googleTools = Array.isArray(agentPayload.google_tools)
+        ? agentPayload.google_tools
+        : [];
+
+      console.log("[Trial] Agent payload google_tools:", googleTools);
 
       // Check if we have an API key before attempting to create agent
       const hasApiKey = apiService.hasApiKey();
@@ -209,13 +217,15 @@ function PaymentContent() {
         }
         setTrialAgentDraft(null);
         clearTrialCredentials();
-        return;
+        return { agent: null, googleTools };
       }
 
       try {
-        await apiService.createAgent(agentPayload);
+        const createdAgent = await apiService.createAgent(agentPayload);
+        console.log("[Trial] Agent created successfully:", createdAgent?.id);
         setTrialAgentDraft(null);
         clearTrialCredentials();
+        return { agent: createdAgent, googleTools };
       } catch (createError) {
         console.error("[Trial] Failed to create agent during trial provisioning", createError);
         // Preserve payload for later creation
@@ -231,6 +241,7 @@ function PaymentContent() {
         }
         setTrialAgentDraft(null);
         clearTrialCredentials();
+        return { agent: null, googleTools };
       }
     },
     [trialAgentDraft, clearTrialCredentials]
@@ -263,9 +274,12 @@ function PaymentContent() {
           queryEmail ||
           "";
 
+        // Track trial agent creation result for Google OAuth
+        let trialAgentResult = { agent: null, googleTools: [] };
+
         if (normalizedPlanCode === "TRIAL" && resolvedEmail) {
           try {
-            await completeTrialProvisioning(resolvedEmail);
+            trialAgentResult = await completeTrialProvisioning(resolvedEmail);
           } catch (err) {
             console.warn("Failed to complete trial provisioning", err);
           }
@@ -296,13 +310,55 @@ function PaymentContent() {
           setOrderSuffix(Date.now().toString());
           setStoredPlan("");
           setPendingRegistration(null);
+
+          // If trial agent was created with Google tools, trigger OAuth and redirect to agent page
+          if (
+            normalizedPlanCode === "TRIAL" &&
+            trialAgentResult.agent?.id &&
+            trialAgentResult.googleTools.length > 0
+          ) {
+            try {
+              const { authUrl, authState } = await triggerGoogleOAuth({
+                agentId: trialAgentResult.agent.id,
+                googleTools: trialAgentResult.googleTools,
+              });
+
+              if (authUrl) {
+                setStatusState({
+                  state: "success",
+                  message: "Trial activated! Connecting to Google...",
+                });
+                toast.success("Trial activated! Setting up Google integration...", { style: toastStyle });
+                hasRedirectedRef.current = true;
+                
+                // Redirect to agent page with auth URL params
+                const agentParams = new URLSearchParams();
+                agentParams.set("authUrl", authUrl);
+                if (authState) {
+                  agentParams.set("authState", authState);
+                }
+                router.replace(`/dashboard/agents/${trialAgentResult.agent.id}?${agentParams.toString()}`);
+                return;
+              }
+            } catch (oauthError) {
+              console.warn("[Trial] Failed to trigger Google OAuth", oauthError);
+              // Continue to regular redirect even if OAuth fails
+            }
+          }
+
           setStatusState({
             state: "success",
             message: "Payment successful! Taking you to your dashboard.",
           });
           toast.success("Payment successful! Redirecting to dashboard...", { style: toastStyle });
           hasRedirectedRef.current = true;
-          router.replace("/dashboard");
+          
+          // If trial agent was created, redirect to agent page instead of dashboard
+          if (normalizedPlanCode === "TRIAL" && trialAgentResult.agent?.id) {
+            router.replace(`/dashboard/agents/${trialAgentResult.agent.id}`);
+          } else {
+            router.replace("/dashboard");
+          }
           return;
         }
 
@@ -342,6 +398,7 @@ function PaymentContent() {
       user,
     ]
   );
+
 
   useEffect(() => {
     if (queryEmail && queryUserId) {
